@@ -1,0 +1,7 @@
+# Server (backend) — not part of the mobile repository
+backend/
+
+# Environment / secrets — never commit
+.env
+.env.local
+*.env
