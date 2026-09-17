@@ -14,6 +14,22 @@ class QaleenSize {
   Map<String, dynamic> toJson() => {'height': height, 'width': width, 'pieces': pieces};
 }
 
+class ColorStock {
+  final String color;
+  final int sets;
+  final int pieces;
+
+  const ColorStock({required this.color, this.sets = 0, this.pieces = 0});
+
+  factory ColorStock.fromJson(Map<String, dynamic> json) => ColorStock(
+        color: json['color']?.toString() ?? '',
+        sets: (json['sets'] as num?)?.toInt() ?? 0,
+        pieces: (json['pieces'] as num?)?.toInt() ?? 0,
+      );
+
+  Map<String, dynamic> toJson() => {'color': color, 'sets': sets, 'pieces': pieces};
+}
+
 class CarpetPieceData {
   final double width;
   final double height;
@@ -73,6 +89,7 @@ class Product {
   final String size;
   final String description;
   final List<String> images;
+  final List<ColorStock> colorStocks;
   final String? shopId;
   final String? shopName;
   final DateTime? createdAt;
@@ -105,6 +122,7 @@ class Product {
     this.size = '',
     this.description = '',
     this.images = const [],
+    this.colorStocks = const [],
     this.shopId,
     this.shopName,
     this.createdAt,
@@ -168,6 +186,10 @@ class Product {
       size: json['size']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       images: (json['images'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      colorStocks: (json['colorStocks'] as List?)
+              ?.map((e) => ColorStock.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       shopId: sId,
       shopName: sName,
       createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? ''),
@@ -199,5 +221,6 @@ class Product {
         'size': size,
         'description': description,
         'images': images,
+        'colorStocks': colorStocks.map((c) => c.toJson()).toList(),
       };
 }

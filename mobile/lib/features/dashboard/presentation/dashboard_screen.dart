@@ -1,4 +1,6 @@
-﻿import 'dart:math' as math;
+﻿import 'dart:convert';
+import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -149,14 +151,14 @@ class DashboardScreen extends ConsumerWidget {
       ),
       const SizedBox(height: 12),
       const _QuickActionsSlider(),
-      if (data.topProducts.isNotEmpty) ...[
+      if (data.products.isNotEmpty) ...[
         const SizedBox(height: 28),
-        const _SectionTitle(
-          title: 'Product Activity',
-          subtitle: 'Best sellers by units sold',
+        _SectionTitle(
+          title: 'Products',
+          subtitle: '${data.products.length} product${data.products.length == 1 ? '' : 's'} · stock by colour',
         ),
         const SizedBox(height: 12),
-        _ProductActivityCard(items: data.topProducts),
+        _ProductTreeCard(items: data.products),
       ],
     ];
   }
@@ -1133,98 +1135,347 @@ class _LowStockRow extends StatelessWidget {
   }
 }
 
-// -------------------------------------------------------- product activity --
+// ------------------------------------------------------------ product tree --
 
-class _ProductActivityCard extends StatelessWidget {
-  const _ProductActivityCard({required this.items});
+class _ProductTreeCard extends StatelessWidget {
+  const _ProductTreeCard({required this.items});
 
-  final List<TopProduct> items;
+  final List<DashboardProduct> items;
 
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       child: items.isEmpty
-          ? const _EmptyNote('No product activity yet')
+          ? const _EmptyNote('No products yet')
           : Column(
               children: items
-                  .take(5)
-                  .indexed
-                  .map((e) => _ProductActivityRow(index: e.$1, product: e.$2))
+                  .take(10)
+                  .map((p) => _ProductTreeTile(product: p))
                   .toList(),
             ),
     );
   }
 }
 
-class _ProductActivityRow extends StatelessWidget {
-  const _ProductActivityRow({required this.index, required this.product});
+class _ProductTreeTile extends StatelessWidget {
+  const _ProductTreeTile({required this.product});
 
-  final int index;
-  final TopProduct product;
+  final DashboardProduct product;
 
   @override
   Widget build(BuildContext context) {
+    final colors = product.colorStocks;
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _ProductThumb(image: product.image),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.code.isEmpty ? product.name : product.code,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: _goldLight,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    if (product.code.isNotEmpty && product.name.isNotEmpty)
+                      Text(
+                        product.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.55),
+                        ),
+                      ),
+                    if (product.size.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const _TreeJoint(),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Size: ${product.size}',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              _StockPill(quantity: product.quantity, low: product.isLowStock),
+            ],
+          ),
+          if (colors.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Divider(color: Colors.white.withValues(alpha: 0.08), height: 1),
+            const SizedBox(height: 6),
+            for (final c in colors) _TreeColorRow(stock: c),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TreeColorRow extends StatelessWidget {
+  const _TreeColorRow({required this.stock});
+
+  final DashboardColorStock stock;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, left: 2),
       child: Row(
         children: [
+          const _TreeJoint(),
+          const SizedBox(width: 8),
           Container(
-            width: 26,
-            height: 26,
+            width: 10,
+            height: 10,
             decoration: BoxDecoration(
-              gradient: index < 3
-                  ? const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [_goldLight, _gold, _goldDark],
-                    )
-                  : null,
-              color: index < 3 ? null : Colors.white.withValues(alpha: 0.08),
+              color: _colorFromName(stock.color),
               shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              '${index + 1}',
-              style: GoogleFonts.poppins(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: index < 3
-                    ? const Color(0xFF17151C)
-                    : Colors.white.withValues(alpha: 0.5),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
-              product.name,
+              stock.color.isEmpty ? '—' : stock.color.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
                 color: Colors.white,
               ),
             ),
           ),
+          _MiniStat(label: 'Sets', value: stock.sets),
+          const SizedBox(width: 6),
+          _MiniStat(label: 'Pieces', value: stock.pieces),
+        ],
+      ),
+    );
+  }
+}
+
+class _TreeJoint extends StatelessWidget {
+  const _TreeJoint();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(color: _gold.withValues(alpha: 0.45), width: 1.2),
+          bottom: BorderSide(color: _gold.withValues(alpha: 0.45), width: 1.2),
+        ),
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(6)),
+      ),
+    );
+  }
+}
+
+class _MiniStat extends StatelessWidget {
+  const _MiniStat({required this.label, required this.value});
+
+  final String label;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: _gold.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _gold.withValues(alpha: 0.25)),
+      ),
+      child: RichText(
+        text: TextSpan(
+          style: GoogleFonts.poppins(
+            fontSize: 10.5,
+            color: Colors.white.withValues(alpha: 0.65),
+          ),
+          children: [
+            TextSpan(text: '$label '),
+            TextSpan(
+              text: '$value',
+              style: GoogleFonts.poppins(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                color: _goldLight,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StockPill extends StatelessWidget {
+  const _StockPill({required this.quantity, required this.low});
+
+  final int quantity;
+  final bool low;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = low ? const Color(0xFFFF6B6B) : const Color(0xFF4ADE80);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        children: [
           Text(
-            '${product.quantity} sold',
+            '$quantity',
             style: GoogleFonts.poppins(
-              fontSize: 11.5,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
-              color: _goldLight,
+              color: color,
+            ),
+          ),
+          Text(
+            'in stock',
+            style: GoogleFonts.poppins(
+              fontSize: 8,
+              color: color.withValues(alpha: 0.85),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class _ProductThumb extends StatelessWidget {
+  const _ProductThumb({required this.image});
+
+  final String image;
+
+  static const double _size = 56;
+
+  static final Uint8List _transparentPixel = Uint8List.fromList([
+    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
+    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
+    0x0D, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x62, 0x00, 0x01, 0x00, 0x00,
+    0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
+    0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+  ]);
+
+  @override
+  Widget build(BuildContext context) {
+    Widget fallback() => Container(
+          width: _size,
+          height: _size,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: _gold.withValues(alpha: 0.3)),
+          ),
+          child: Icon(
+            Icons.chair_outlined,
+            color: _gold.withValues(alpha: 0.7),
+            size: _size * 0.46,
+          ),
+        );
+
+    if (image.isEmpty) return fallback();
+    ImageProvider provider;
+    if (image.startsWith('data:image')) {
+      try {
+        provider = MemoryImage(base64.decode(image.split(',').last));
+      } catch (_) {
+        provider = MemoryImage(_transparentPixel);
+      }
+    } else {
+      provider = NetworkImage(image);
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image(
+        image: provider,
+        width: _size,
+        height: _size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => fallback(),
+      ),
+    );
+  }
+}
+
+Color _colorFromName(String name) {
+  switch (name.trim().toLowerCase()) {
+    case 'red':
+      return const Color(0xFFE53935);
+    case 'blue':
+      return const Color(0xFF1E88E5);
+    case 'green':
+      return const Color(0xFF43A047);
+    case 'yellow':
+      return const Color(0xFFFDD835);
+    case 'orange':
+      return const Color(0xFFFB8C00);
+    case 'purple':
+      return const Color(0xFF8E24AA);
+    case 'pink':
+      return const Color(0xFFEC407A);
+    case 'brown':
+      return const Color(0xFF8D6E63);
+    case 'black':
+      return const Color(0xFF212121);
+    case 'white':
+      return const Color(0xFFF5F5F5);
+    case 'grey':
+    case 'gray':
+      return const Color(0xFF9E9E9E);
+    case 'beige':
+    case 'cream':
+      return const Color(0xFFE8DCC0);
+    case 'maroon':
+      return const Color(0xFF800000);
+    case 'navy':
+      return const Color(0xFF1A237E);
+    case 'gold':
+      return _gold;
+    default:
+      return _gold;
   }
 }
 

@@ -78,6 +78,61 @@ class TopProduct {
       );
 }
 
+class DashboardColorStock {
+  final String color;
+  final int sets;
+  final int pieces;
+
+  const DashboardColorStock({required this.color, this.sets = 0, this.pieces = 0});
+
+  factory DashboardColorStock.fromJson(Map<String, dynamic> json) => DashboardColorStock(
+        color: json['color']?.toString() ?? '',
+        sets: (json['sets'] as num?)?.toInt() ?? 0,
+        pieces: (json['pieces'] as num?)?.toInt() ?? 0,
+      );
+}
+
+class DashboardProduct {
+  final String id;
+  final String name;
+  final String code;
+  final String size;
+  final String image;
+  final int quantity;
+  final int lowStockThreshold;
+  final String productType;
+  final List<DashboardColorStock> colorStocks;
+
+  const DashboardProduct({
+    required this.id,
+    required this.name,
+    this.code = '',
+    this.size = '',
+    this.image = '',
+    this.quantity = 0,
+    this.lowStockThreshold = 0,
+    this.productType = 'qaleen',
+    this.colorStocks = const [],
+  });
+
+  bool get isLowStock => quantity <= lowStockThreshold;
+
+  factory DashboardProduct.fromJson(Map<String, dynamic> json) => DashboardProduct(
+        id: (json['id'] ?? json['_id']).toString(),
+        name: json['name']?.toString() ?? 'Product',
+        code: json['code']?.toString() ?? '',
+        size: json['size']?.toString() ?? '',
+        image: json['image']?.toString() ?? '',
+        quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+        lowStockThreshold: (json['lowStockThreshold'] as num?)?.toInt() ?? 0,
+        productType: json['productType']?.toString() ?? 'qaleen',
+        colorStocks: (json['colorStocks'] as List?)
+                ?.map((e) => DashboardColorStock.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            const [],
+      );
+}
+
 class ActivityItem {
   final String type;
   final String title;
@@ -236,6 +291,7 @@ class DashboardData {
   final List<LowStockProduct> lowStock;
   final List<ActivityItem> recentActivity;
   final ManagerBranch? branch;
+  final List<DashboardProduct> products;
 
   const DashboardData({
     this.role,
@@ -252,6 +308,7 @@ class DashboardData {
     this.lowStock = const [],
     this.recentActivity = const [],
     this.branch,
+    this.products = const [],
   });
 
   factory DashboardData.fromJson(Map<String, dynamic> json) {
@@ -272,6 +329,7 @@ class DashboardData {
       lowStock: (json['lowStock'] as List?)?.map((e) => LowStockProduct.fromJson(e as Map<String, dynamic>)).toList() ?? const [],
       recentActivity: (json['recentActivity'] as List?)?.map((e) => ActivityItem.fromJson(e as Map<String, dynamic>)).toList() ?? const [],
       branch: branchJson is Map<String, dynamic> ? ManagerBranch.fromJson(branchJson) : null,
+      products: (json['products'] as List?)?.map((e) => DashboardProduct.fromJson(e as Map<String, dynamic>)).toList() ?? const [],
     );
   }
 }
