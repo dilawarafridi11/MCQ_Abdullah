@@ -1,0 +1,11 @@
+node_modules/
+.env
+npm-debug.log*
+uploads/*
+!uploads/.gitkeep
+.DS_Store
+
+# Runtime server logs / pid
+server*.log
+*.server.pid
+.server.pid

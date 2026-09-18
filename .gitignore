@@ -1,5 +1,6 @@
-# Server (backend) — not part of the mobile repository
-backend/
+# Server logs — never commit
+server*.log
+*.server.pid
 
 # Environment / secrets — never commit
 .env
