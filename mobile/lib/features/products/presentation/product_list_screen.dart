@@ -206,16 +206,8 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final lowStock = product.isLowStock;
-    final typeIcon = product.productType == 'carpet'
-        ? Icons.grid_on
-        : product.productType == 'meter'
-            ? Icons.straighten
-            : Icons.inventory_2_outlined;
-    final typeLabel = product.productType == 'carpet'
-        ? 'Carpet'
-        : product.productType == 'meter'
-            ? 'Meter'
-            : 'Qaleen';
+    final typeIcon = _typeIcon(product.productType);
+    final typeLabel = _typeLabel(product.productType);
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -334,6 +326,17 @@ class _ProductCard extends StatelessWidget {
         return '${p.quantity} sqft';
       case 'meter':
         return '${p.meterLength}m | ${Formatters.currency(p.costPerMeter)}/m';
+      case 'foam':
+        final parts = <String>[];
+        if (p.foamLength > 0 && p.foamWidth > 0) {
+          parts.add('${_trim(p.foamLength)}ft x ${_trim(p.foamWidth)}ft');
+        }
+        if (p.foamThickness > 0) parts.add('${_trim(p.foamThickness)}in thick');
+        parts.add('${p.quantity} pcs');
+        return parts.join(' | ');
+      case 'pillow':
+        final sz = p.pillowSize.isNotEmpty ? p.pillowSize : p.size;
+        return '${sz.isEmpty ? 'Pillow' : sz} | ${p.quantity} pcs';
       case 'qaleen':
         if (p.qaleenSizes.isNotEmpty) {
           final total = p.qaleenSizes.fold(0, (sum, s) => sum + s.pieces);
@@ -352,12 +355,43 @@ class _ProductCard extends StatelessWidget {
       case 'meter':
         return '${p.meterLength}m';
       case 'qaleen':
-        if (p.qaleenSizes.isNotEmpty) {
-          return '${p.quantity} pcs';
-        }
+      case 'foam':
+      case 'pillow':
         return '${p.quantity} pcs';
       default:
         return '${p.quantity} in stock';
     }
+  }
+
+  String _trim(double v) => v == v.truncateToDouble() ? '${v.toInt()}' : '$v';
+}
+
+IconData _typeIcon(String t) {
+  switch (t) {
+    case 'carpet':
+      return Icons.grid_on;
+    case 'meter':
+      return Icons.straighten;
+    case 'foam':
+      return Icons.weekend_outlined;
+    case 'pillow':
+      return Icons.king_bed_outlined;
+    default:
+      return Icons.inventory_2_outlined;
+  }
+}
+
+String _typeLabel(String t) {
+  switch (t) {
+    case 'carpet':
+      return 'Carpet';
+    case 'meter':
+      return 'Meter';
+    case 'foam':
+      return 'Foam';
+    case 'pillow':
+      return 'Pillow';
+    default:
+      return 'Qaleen';
   }
 }

@@ -33,7 +33,7 @@ const productSchema = new mongoose.Schema(
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
     brand: { type: String, default: '' },
     supplier: { type: String, default: '' },
-    productType: { type: String, enum: ['carpet', 'qaleen', 'meter'], default: 'qaleen' },
+    productType: { type: String, enum: ['carpet', 'qaleen', 'meter', 'foam', 'pillow'], default: 'qaleen' },
 
     carpetWidth: { type: Number, default: 0 },
     carpetHeight: { type: Number, default: 0 },
@@ -46,6 +46,11 @@ const productSchema = new mongoose.Schema(
 
     meterLength: { type: Number, default: 0 },
     costPerMeter: { type: Number, default: 0 },
+
+    foamLength: { type: Number, default: 0 },
+    foamWidth: { type: Number, default: 0 },
+    foamThickness: { type: Number, default: 0 },
+    pillowSize: { type: String, default: '' },
 
     costPrice: { type: Number, required: true, min: 0, default: 0 },
     sellingPrice: { type: Number, min: 0, default: 0 },

@@ -81,6 +81,10 @@ class Product {
   final List<QaleenSize> qaleenSizes;
   final double meterLength;
   final double costPerMeter;
+  final double foamLength;
+  final double foamWidth;
+  final double foamThickness;
+  final String pillowSize;
   final double costPrice;
   final double sellingPrice;
   final int quantity;
@@ -114,6 +118,10 @@ class Product {
     this.qaleenSizes = const [],
     this.meterLength = 0,
     this.costPerMeter = 0,
+    this.foamLength = 0,
+    this.foamWidth = 0,
+    this.foamThickness = 0,
+    this.pillowSize = '',
     required this.costPrice,
     this.sellingPrice = 0,
     this.quantity = 0,
@@ -178,6 +186,10 @@ class Product {
           const [],
       meterLength: (json['meterLength'] as num?)?.toDouble() ?? 0,
       costPerMeter: (json['costPerMeter'] as num?)?.toDouble() ?? 0,
+      foamLength: (json['foamLength'] as num?)?.toDouble() ?? 0,
+      foamWidth: (json['foamWidth'] as num?)?.toDouble() ?? 0,
+      foamThickness: (json['foamThickness'] as num?)?.toDouble() ?? 0,
+      pillowSize: json['pillowSize']?.toString() ?? '',
       costPrice: (json['costPrice'] as num?)?.toDouble() ?? 0,
       sellingPrice: (json['sellingPrice'] as num?)?.toDouble() ?? 0,
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
@@ -214,6 +226,10 @@ class Product {
         'qaleenSizes': qaleenSizes.map((s) => s.toJson()).toList(),
         'meterLength': meterLength,
         'costPerMeter': costPerMeter,
+        'foamLength': foamLength,
+        'foamWidth': foamWidth,
+        'foamThickness': foamThickness,
+        'pillowSize': pillowSize,
         'costPrice': costPrice,
         'sellingPrice': sellingPrice,
         'lowStockThreshold': lowStockThreshold,

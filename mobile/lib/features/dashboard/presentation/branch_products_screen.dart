@@ -194,16 +194,20 @@ class _ProductCard extends StatelessWidget {
         : product.productType == 'meter'
         ? 'm'
         : 'pcs';
-    final typeLabel = product.productType == 'carpet'
-        ? 'Carpet'
-        : product.productType == 'meter'
-        ? 'Meter'
-        : 'Qaleen';
-    final typeIcon = product.productType == 'carpet'
-        ? Icons.grid_on
-        : product.productType == 'meter'
-        ? Icons.straighten
-        : Icons.inventory_2_outlined;
+    final typeLabel = switch (product.productType) {
+      'carpet' => 'Carpet',
+      'meter' => 'Meter',
+      'foam' => 'Foam',
+      'pillow' => 'Pillow',
+      _ => 'Qaleen',
+    };
+    final typeIcon = switch (product.productType) {
+      'carpet' => Icons.grid_on,
+      'meter' => Icons.straighten,
+      'foam' => Icons.weekend_outlined,
+      'pillow' => Icons.king_bed_outlined,
+      _ => Icons.inventory_2_outlined,
+    };
     final stockValue = product.quantity * product.costPrice;
 
     return Card(

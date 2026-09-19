@@ -70,16 +70,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final secondary = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
     final p = _product;
-    final typeIcon = p.productType == 'carpet'
-        ? Icons.grid_on
-        : p.productType == 'meter'
-            ? Icons.straighten
-            : Icons.inventory_2_outlined;
-    final typeLabel = p.productType == 'carpet'
-        ? 'Carpet'
-        : p.productType == 'meter'
-            ? 'Meter'
-            : 'Qaleen';
+    final typeIcon = switch (p.productType) {
+      'carpet' => Icons.grid_on,
+      'meter' => Icons.straighten,
+      'foam' => Icons.weekend_outlined,
+      'pillow' => Icons.king_bed_outlined,
+      _ => Icons.inventory_2_outlined,
+    };
+    final typeLabel = switch (p.productType) {
+      'carpet' => 'Carpet',
+      'meter' => 'Meter',
+      'foam' => 'Foam',
+      'pillow' => 'Pillow',
+      _ => 'Qaleen',
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -296,10 +300,46 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               _InfoRow(icon: Icons.attach_money, label: 'Cost / meter', value: Formatters.currency(p.costPerMeter)),
           ],
         );
+      case 'foam':
+        return _SectionCard(
+          title: 'Pieces',
+          icon: Icons.layers_outlined,
+          children: [
+            _InfoRow(
+              icon: Icons.square_foot,
+              label: 'Dimensions',
+              value: p.foamLength > 0 || p.foamWidth > 0
+                  ? '${_dim(p.foamLength)}ft x ${_dim(p.foamWidth)}ft'
+                  : '—',
+            ),
+            if (p.foamThickness > 0)
+              _InfoRow(icon: Icons.vertical_align_center, label: 'Thickness', value: '${_dim(p.foamThickness)}in'),
+            _InfoRow(icon: Icons.inventory_2_outlined, label: 'Quantity', value: '${p.quantity} pieces'),
+            if (p.costPrice > 0)
+              _InfoRow(icon: Icons.attach_money, label: 'Cost / piece', value: Formatters.currency(p.costPrice)),
+          ],
+        );
+      case 'pillow':
+        return _SectionCard(
+          title: 'Pieces',
+          icon: Icons.layers_outlined,
+          children: [
+            _InfoRow(
+              icon: Icons.square_foot,
+              label: 'Size',
+              value: p.pillowSize.isNotEmpty ? p.pillowSize : (p.size.isEmpty ? '—' : p.size),
+            ),
+            _InfoRow(icon: Icons.inventory_2_outlined, label: 'Quantity', value: '${p.quantity} pieces'),
+            if (p.costPrice > 0)
+              _InfoRow(icon: Icons.attach_money, label: 'Cost / piece', value: Formatters.currency(p.costPrice)),
+          ],
+        );
       default:
         return const SizedBox.shrink();
     }
   }
+
+  String _dim(double v) => v == v.truncateToDouble() ? '${v.toInt()}' : '$v';
 
   String _stockLabel(Product p) {
     switch (p.productType) {

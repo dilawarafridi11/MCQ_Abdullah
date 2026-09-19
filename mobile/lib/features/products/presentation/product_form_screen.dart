@@ -11,6 +11,14 @@ import '../../../core/widgets/status_views.dart';
 import '../../products/models/product.dart';
 import '../providers/product_providers.dart';
 
+const _typeOptions = <({String value, String label, IconData icon})>[
+  (value: 'qaleen', label: 'Qaleen', icon: Icons.inventory_2_outlined),
+  (value: 'carpet', label: 'Carpet', icon: Icons.grid_on),
+  (value: 'meter', label: 'Meter', icon: Icons.straighten),
+  (value: 'foam', label: 'Foam', icon: Icons.weekend_outlined),
+  (value: 'pillow', label: 'Pillows', icon: Icons.king_bed_outlined),
+];
+
 class ProductFormScreen extends ConsumerStatefulWidget {
   const ProductFormScreen({super.key, this.product});
 
@@ -23,10 +31,26 @@ class ProductFormScreen extends ConsumerStatefulWidget {
 class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _imagePicker = ImagePicker();
+
   late final TextEditingController _name;
   late final TextEditingController _sku;
   late final TextEditingController _size;
+  late final TextEditingController _costPerPiece;
+  late final TextEditingController _costPerSqft;
+  late final TextEditingController _carpetWidth;
+  late final TextEditingController _carpetHeight;
+  late final TextEditingController _carpetPieces;
+  late final TextEditingController _meterLength;
+  late final TextEditingController _costPerMeter;
+  late final TextEditingController _foamLength;
+  late final TextEditingController _foamWidth;
+  late final TextEditingController _foamThickness;
+  late final TextEditingController _quantity;
+  late final TextEditingController _costPrice;
+  late final TextEditingController _sellingPrice;
+  late final TextEditingController _pillowSize;
 
+  late String _productType;
   List<ColorStock> _colorStocks = [];
   Uint8List? _productImageBytes;
   bool _imageRemoved = false;
@@ -37,9 +61,26 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     super.initState();
     final p = widget.product;
     _isEdit = p != null;
+    final existingType = p?.productType ?? '';
+    _productType = existingType.isEmpty ? 'qaleen' : existingType;
+
     _name = TextEditingController(text: p?.name ?? '');
     _sku = TextEditingController(text: p?.sku ?? '');
     _size = TextEditingController(text: p?.size ?? '');
+    _costPerPiece = TextEditingController(text: p != null && p.costPerPiece > 0 ? _fmt(p.costPerPiece) : '');
+    _costPerSqft = TextEditingController(text: p != null && p.costPerSqft > 0 ? _fmt(p.costPerSqft) : '');
+    _carpetWidth = TextEditingController(text: p != null && p.carpetWidth > 0 ? _fmt(p.carpetWidth) : '');
+    _carpetHeight = TextEditingController(text: p != null && p.carpetHeight > 0 ? _fmt(p.carpetHeight) : '');
+    _carpetPieces = TextEditingController(text: p != null && p.carpetPieces > 0 ? '${p.carpetPieces}' : '');
+    _meterLength = TextEditingController(text: p != null && p.meterLength > 0 ? _fmt(p.meterLength) : '');
+    _costPerMeter = TextEditingController(text: p != null && p.costPerMeter > 0 ? _fmt(p.costPerMeter) : '');
+    _foamLength = TextEditingController(text: p != null && p.foamLength > 0 ? _fmt(p.foamLength) : '');
+    _foamWidth = TextEditingController(text: p != null && p.foamWidth > 0 ? _fmt(p.foamWidth) : '');
+    _foamThickness = TextEditingController(text: p != null && p.foamThickness > 0 ? _fmt(p.foamThickness) : '');
+    _quantity = TextEditingController(text: p != null && p.quantity > 0 ? '${p.quantity}' : '');
+    _costPrice = TextEditingController(text: p != null && p.costPrice > 0 ? _fmt(p.costPrice) : '');
+    _sellingPrice = TextEditingController(text: p != null && p.sellingPrice > 0 ? _fmt(p.sellingPrice) : '');
+    _pillowSize = TextEditingController(text: p?.pillowSize ?? '');
 
     _colorStocks = p?.colorStocks.toList() ?? [];
     final existingImage = (p?.images.isNotEmpty ?? false) ? p!.images.first : '';
@@ -55,11 +96,51 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     _name.dispose();
     _sku.dispose();
     _size.dispose();
+    _costPerPiece.dispose();
+    _costPerSqft.dispose();
+    _carpetWidth.dispose();
+    _carpetHeight.dispose();
+    _carpetPieces.dispose();
+    _meterLength.dispose();
+    _costPerMeter.dispose();
+    _foamLength.dispose();
+    _foamWidth.dispose();
+    _foamThickness.dispose();
+    _quantity.dispose();
+    _costPrice.dispose();
+    _sellingPrice.dispose();
+    _pillowSize.dispose();
     super.dispose();
   }
 
+  static String _fmt(double v) => v == v.roundToDouble() ? '${v.toInt()}' : '$v';
+
+  double _toDouble(TextEditingController c) => double.tryParse(c.text.trim()) ?? 0;
+
+  int get _colorStockQty => _colorStocks.fold(0, (sum, c) => sum + c.pieces);
+
   int get _computedQuantity {
-    return _colorStocks.fold(0, (sum, c) => sum + c.pieces);
+    switch (_productType) {
+      case 'qaleen':
+        return _colorStockQty;
+      case 'carpet':
+        return (_toDouble(_carpetWidth) * _toDouble(_carpetHeight)).round();
+      case 'meter':
+        return _toDouble(_meterLength).round();
+      default:
+        return int.tryParse(_quantity.text.trim()) ?? 0;
+    }
+  }
+
+  String get _stockUnit {
+    switch (_productType) {
+      case 'carpet':
+        return 'sqft';
+      case 'meter':
+        return 'm';
+      default:
+        return 'pcs';
+    }
   }
 
   String _buildImageDataUrl(Uint8List bytes) {
@@ -177,8 +258,38 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       'name': _name.text.trim(),
       'sku': _sku.text.trim(),
       'size': _size.text.trim(),
-      'colorStocks': _colorStocks.map((c) => c.toJson()).toList(),
+      'productType': _productType,
+      'sellingPrice': _toDouble(_sellingPrice),
     };
+
+    switch (_productType) {
+      case 'carpet':
+        data['carpetWidth'] = _toDouble(_carpetWidth);
+        data['carpetHeight'] = _toDouble(_carpetHeight);
+        data['carpetPieces'] = int.tryParse(_carpetPieces.text.trim()) ?? 0;
+        data['costPerSqft'] = _toDouble(_costPerSqft);
+        break;
+      case 'qaleen':
+        data['colorStocks'] = _colorStocks.map((c) => c.toJson()).toList();
+        data['costPerPiece'] = _toDouble(_costPerPiece);
+        break;
+      case 'meter':
+        data['meterLength'] = _toDouble(_meterLength);
+        data['costPerMeter'] = _toDouble(_costPerMeter);
+        break;
+      case 'foam':
+        data['foamLength'] = _toDouble(_foamLength);
+        data['foamWidth'] = _toDouble(_foamWidth);
+        data['foamThickness'] = _toDouble(_foamThickness);
+        data['quantity'] = int.tryParse(_quantity.text.trim()) ?? 0;
+        data['costPrice'] = _toDouble(_costPrice);
+        break;
+      case 'pillow':
+        data['pillowSize'] = _pillowSize.text.trim();
+        data['quantity'] = int.tryParse(_quantity.text.trim()) ?? 0;
+        data['costPrice'] = _toDouble(_costPrice);
+        break;
+    }
 
     if (_productImageBytes != null) {
       data['images'] = [_buildImageDataUrl(_productImageBytes!)];
@@ -221,6 +332,31 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
               ),
               const SizedBox(height: 14),
 
+              DropdownButtonFormField<String>(
+                initialValue: _productType,
+                decoration: const InputDecoration(
+                  labelText: 'Product Type',
+                  prefixIcon: Icon(Icons.category_outlined),
+                ),
+                items: _typeOptions
+                    .map((o) => DropdownMenuItem(
+                          value: o.value,
+                          child: Row(
+                            children: [
+                              Icon(o.icon, size: 18, color: AppColors.primary),
+                              const SizedBox(width: 10),
+                              Text(o.label),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (v) {
+                  if (v == null) return;
+                  setState(() => _productType = v);
+                },
+              ),
+              const SizedBox(height: 14),
+
               _buildProductImagePicker(),
               const SizedBox(height: 14),
 
@@ -243,7 +379,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
               ),
               const SizedBox(height: 14),
 
-              _buildColorStocksSection(),
+              _buildTypeFields(),
               const SizedBox(height: 24),
 
               LoadingButton(
@@ -257,6 +393,118 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         ),
       ),
     );
+  }
+
+  // ------------------------------------------------------ dynamic type fields --
+
+  Widget _buildTypeFields() {
+    switch (_productType) {
+      case 'carpet':
+        return _SectionCard(
+          title: 'Carpet Details',
+          subtitle: 'Stock is computed as width × height',
+          children: [
+            _NumField(controller: _carpetWidth, label: 'Width (m)', icon: Icons.straighten),
+            const SizedBox(height: 12),
+            _NumField(controller: _carpetHeight, label: 'Height (m)', icon: Icons.height),
+            const SizedBox(height: 12),
+            _NumField(controller: _carpetPieces, label: 'Rolls / Pieces', icon: Icons.layers_outlined),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _NumField(controller: _costPerSqft, label: 'Cost / sqft', icon: Icons.attach_money, prefix: 'Rs. ')),
+                const SizedBox(width: 10),
+                Expanded(child: _NumField(controller: _sellingPrice, label: 'Selling Price', icon: Icons.sell_outlined, prefix: 'Rs. ')),
+              ],
+            ),
+          ],
+        );
+      case 'qaleen':
+        return Column(
+          children: [
+            _buildColorStocksSection(),
+            const SizedBox(height: 14),
+            _SectionCard(
+              title: 'Pricing',
+              subtitle: 'Per piece',
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: _NumField(controller: _costPerPiece, label: 'Cost / piece', icon: Icons.attach_money, prefix: 'Rs. ')),
+                    const SizedBox(width: 10),
+                    Expanded(child: _NumField(controller: _sellingPrice, label: 'Selling Price', icon: Icons.sell_outlined, prefix: 'Rs. ')),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        );
+      case 'meter':
+        return _SectionCard(
+          title: 'Meter Details',
+          subtitle: 'Stock is the meter length',
+          children: [
+            _NumField(controller: _meterLength, label: 'Meter Length (m)', icon: Icons.straighten),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _NumField(controller: _costPerMeter, label: 'Cost / meter', icon: Icons.attach_money, prefix: 'Rs. ')),
+                const SizedBox(width: 10),
+                Expanded(child: _NumField(controller: _sellingPrice, label: 'Selling Price', icon: Icons.sell_outlined, prefix: 'Rs. ')),
+              ],
+            ),
+          ],
+        );
+      case 'foam':
+        return _SectionCard(
+          title: 'Foam Details',
+          subtitle: 'Track pieces & dimensions',
+          children: [
+            Wrap(
+              spacing: 10,
+              runSpacing: 12,
+              children: [
+                SizedBox(width: 100, child: _NumField(controller: _foamLength, label: 'Length (ft)', icon: Icons.straighten)),
+                SizedBox(width: 100, child: _NumField(controller: _foamWidth, label: 'Width (ft)', icon: Icons.height)),
+                SizedBox(width: 100, child: _NumField(controller: _foamThickness, label: 'Thickness (in)', icon: Icons.vertical_align_center)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _NumField(controller: _quantity, label: 'Pieces', icon: Icons.inventory_2_outlined)),
+                const SizedBox(width: 10),
+                Expanded(child: _NumField(controller: _costPrice, label: 'Cost / piece', icon: Icons.attach_money, prefix: 'Rs. ')),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _NumField(controller: _sellingPrice, label: 'Selling Price', icon: Icons.sell_outlined, prefix: 'Rs. '),
+          ],
+        );
+      case 'pillow':
+        return _SectionCard(
+          title: 'Pillow Details',
+          subtitle: 'Track pieces & pricing',
+          children: [
+            TextFormField(
+              controller: _pillowSize,
+              decoration: const InputDecoration(labelText: 'Pillow Size (e.g. 18 × 18)', prefixIcon: Icon(Icons.square_foot)),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _NumField(controller: _quantity, label: 'Pieces', icon: Icons.inventory_2_outlined)),
+                const SizedBox(width: 10),
+                Expanded(child: _NumField(controller: _costPrice, label: 'Cost / piece', icon: Icons.attach_money, prefix: 'Rs. ')),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _NumField(controller: _sellingPrice, label: 'Selling Price', icon: Icons.sell_outlined, prefix: 'Rs. '),
+          ],
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   Widget _buildProductImagePicker() {
@@ -333,7 +581,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(
-                'Add colours to track sets and pieces per colour. Total stock: $_computedQuantity.',
+                'Add colours to track sets and pieces per colour. Total stock: $_computedQuantity $_stockUnit.',
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
             )
@@ -369,6 +617,69 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
               );
             }),
         ],
+      ),
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({required this.title, required this.children, this.subtitle});
+
+  final String title;
+  final String? subtitle;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+          if (subtitle != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              subtitle!,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+          const SizedBox(height: 12),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _NumField extends StatelessWidget {
+  const _NumField({
+    required this.controller,
+    required this.label,
+    required this.icon,
+    this.prefix,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final IconData icon;
+  final String? prefix;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        prefixText: prefix,
+        border: const OutlineInputBorder(),
       ),
     );
   }
