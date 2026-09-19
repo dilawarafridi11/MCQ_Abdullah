@@ -42,9 +42,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   late final TextEditingController _carpetPieces;
   late final TextEditingController _meterLength;
   late final TextEditingController _costPerMeter;
-  late final TextEditingController _foamLength;
-  late final TextEditingController _foamWidth;
-  late final TextEditingController _foamThickness;
   late final TextEditingController _quantity;
   late final TextEditingController _costPrice;
   late final TextEditingController _sellingPrice;
@@ -52,6 +49,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   late String _productType;
   List<ColorStock> _colorStocks = [];
+  List<SizeStock> _sizeStocks = [];
   Uint8List? _productImageBytes;
   bool _imageRemoved = false;
   bool _isEdit = false;
@@ -74,15 +72,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     _carpetPieces = TextEditingController(text: p != null && p.carpetPieces > 0 ? '${p.carpetPieces}' : '');
     _meterLength = TextEditingController(text: p != null && p.meterLength > 0 ? _fmt(p.meterLength) : '');
     _costPerMeter = TextEditingController(text: p != null && p.costPerMeter > 0 ? _fmt(p.costPerMeter) : '');
-    _foamLength = TextEditingController(text: p != null && p.foamLength > 0 ? _fmt(p.foamLength) : '');
-    _foamWidth = TextEditingController(text: p != null && p.foamWidth > 0 ? _fmt(p.foamWidth) : '');
-    _foamThickness = TextEditingController(text: p != null && p.foamThickness > 0 ? _fmt(p.foamThickness) : '');
     _quantity = TextEditingController(text: p != null && p.quantity > 0 ? '${p.quantity}' : '');
     _costPrice = TextEditingController(text: p != null && p.costPrice > 0 ? _fmt(p.costPrice) : '');
     _sellingPrice = TextEditingController(text: p != null && p.sellingPrice > 0 ? _fmt(p.sellingPrice) : '');
     _pillowSize = TextEditingController(text: p?.pillowSize ?? '');
 
     _colorStocks = p?.colorStocks.toList() ?? [];
+    _sizeStocks = p?.sizeStocks.toList() ?? [];
     final existingImage = (p?.images.isNotEmpty ?? false) ? p!.images.first : '';
     if (existingImage.startsWith('data:image')) {
       try {
@@ -103,9 +99,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     _carpetPieces.dispose();
     _meterLength.dispose();
     _costPerMeter.dispose();
-    _foamLength.dispose();
-    _foamWidth.dispose();
-    _foamThickness.dispose();
     _quantity.dispose();
     _costPrice.dispose();
     _sellingPrice.dispose();
@@ -119,6 +112,8 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   int get _colorStockQty => _colorStocks.fold(0, (sum, c) => sum + c.pieces);
 
+  int get _sizeStockQty => _sizeStocks.fold(0, (sum, s) => sum + s.pieces);
+
   int get _computedQuantity {
     switch (_productType) {
       case 'qaleen':
@@ -127,6 +122,8 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         return (_toDouble(_carpetWidth) * _toDouble(_carpetHeight)).round();
       case 'meter':
         return _toDouble(_meterLength).round();
+      case 'foam':
+        return _sizeStockQty;
       default:
         return int.tryParse(_quantity.text.trim()) ?? 0;
     }
@@ -251,6 +248,61 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     );
   }
 
+  void _addSizeStock() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) {
+        final sizeCtrl = TextEditingController();
+        final piecesCtrl = TextEditingController();
+        return Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Add Size', style: Theme.of(ctx).textTheme.titleMedium),
+              const SizedBox(height: 12),
+              TextField(
+                controller: sizeCtrl,
+                decoration: const InputDecoration(labelText: 'Size (e.g. 6 × 3, 72 × 36)', prefixIcon: Icon(Icons.straighten)),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: piecesCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Pieces', prefixIcon: Icon(Icons.inventory_2_outlined)),
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                onPressed: () {
+                  final size = sizeCtrl.text.trim();
+                  if (size.isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(content: Text('Please enter a size')),
+                    );
+                    return;
+                  }
+                  setState(() {
+                    _sizeStocks = [
+                      ..._sizeStocks,
+                      SizeStock(
+                        size: size,
+                        pieces: int.tryParse(piecesCtrl.text.trim()) ?? 0,
+                      ),
+                    ];
+                  });
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Add Size'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final notifier = ref.read(productMutationControllerProvider.notifier);
@@ -278,10 +330,8 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         data['costPerMeter'] = _toDouble(_costPerMeter);
         break;
       case 'foam':
-        data['foamLength'] = _toDouble(_foamLength);
-        data['foamWidth'] = _toDouble(_foamWidth);
-        data['foamThickness'] = _toDouble(_foamThickness);
-        data['quantity'] = int.tryParse(_quantity.text.trim()) ?? 0;
+        data['sizeStocks'] = _sizeStocks.map((s) => s.toJson()).toList();
+        data['quantity'] = _sizeStockQty;
         data['costPrice'] = _toDouble(_costPrice);
         break;
       case 'pillow':
@@ -368,13 +418,15 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                       decoration: const InputDecoration(labelText: 'Product Code / SKU', prefixIcon: Icon(Icons.tag)),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _size,
-                      decoration: const InputDecoration(labelText: 'Size (e.g. 200 × 300)', prefixIcon: Icon(Icons.straighten)),
+                  if (_productType != 'foam' && _productType != 'pillow') ...[
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _size,
+                        decoration: const InputDecoration(labelText: 'Size (e.g. 200 × 300)', prefixIcon: Icon(Icons.straighten)),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
               const SizedBox(height: 14),
@@ -456,29 +508,22 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           ],
         );
       case 'foam':
-        return _SectionCard(
-          title: 'Foam Details',
-          subtitle: 'Track pieces & dimensions',
+        return Column(
           children: [
-            Wrap(
-              spacing: 10,
-              runSpacing: 12,
+            _buildSizeStocksSection(),
+            const SizedBox(height: 14),
+            _SectionCard(
+              title: 'Pricing',
+              subtitle: 'Per piece',
               children: [
-                SizedBox(width: 100, child: _NumField(controller: _foamLength, label: 'Length (ft)', icon: Icons.straighten)),
-                SizedBox(width: 100, child: _NumField(controller: _foamWidth, label: 'Width (ft)', icon: Icons.height)),
-                SizedBox(width: 100, child: _NumField(controller: _foamThickness, label: 'Thickness (in)', icon: Icons.vertical_align_center)),
+                _NumField(
+                  controller: _costPrice,
+                  label: 'Cost Price',
+                  icon: Icons.attach_money,
+                  prefix: 'Rs. ',
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _NumField(controller: _quantity, label: 'Pieces', icon: Icons.inventory_2_outlined)),
-                const SizedBox(width: 10),
-                Expanded(child: _NumField(controller: _costPrice, label: 'Cost / piece', icon: Icons.attach_money, prefix: 'Rs. ')),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _NumField(controller: _sellingPrice, label: 'Selling Price', icon: Icons.sell_outlined, prefix: 'Rs. '),
           ],
         );
       case 'pillow':
@@ -616,6 +661,71 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 ),
               );
             }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSizeStocksSection() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Sizes & Pieces',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _addSizeStock,
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add'),
+              ),
+            ],
+          ),
+          if (_sizeStocks.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                'Add sizes and how many pieces per size. Total stock: $_sizeStockQty $_stockUnit.',
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
+            )
+          else ...[
+            ...List.generate(_sizeStocks.length, (i) {
+              final s = _sizeStocks[i];
+              return Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Row(
+                  children: [
+                    const Icon(Icons.straighten, size: 16, color: AppColors.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(s.size, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    ),
+                    Text('Pieces: ${s.pieces}', style: const TextStyle(fontSize: 12)),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 18),
+                      onPressed: () => setState(() => _sizeStocks.removeAt(i)),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const SizedBox(height: 4),
+            Text(
+              'Total: $_sizeStockQty $_stockUnit',
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary),
+            ),
+          ],
         ],
       ),
     );

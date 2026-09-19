@@ -327,6 +327,10 @@ class _ProductCard extends StatelessWidget {
       case 'meter':
         return '${p.meterLength}m | ${Formatters.currency(p.costPerMeter)}/m';
       case 'foam':
+        if (p.sizeStocks.isNotEmpty) {
+          final total = p.sizeStocks.fold(0, (sum, s) => sum + s.pieces);
+          return '${p.sizeStocks.length} size${p.sizeStocks.length == 1 ? '' : 's'} | $total pcs';
+        }
         final parts = <String>[];
         if (p.foamLength > 0 && p.foamWidth > 0) {
           parts.add('${_trim(p.foamLength)}ft x ${_trim(p.foamWidth)}ft');

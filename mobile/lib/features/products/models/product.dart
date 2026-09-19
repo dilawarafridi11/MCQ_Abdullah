@@ -30,6 +30,20 @@ class ColorStock {
   Map<String, dynamic> toJson() => {'color': color, 'sets': sets, 'pieces': pieces};
 }
 
+class SizeStock {
+  final String size;
+  final int pieces;
+
+  const SizeStock({required this.size, this.pieces = 0});
+
+  factory SizeStock.fromJson(Map<String, dynamic> json) => SizeStock(
+        size: json['size']?.toString() ?? '',
+        pieces: (json['pieces'] as num?)?.toInt() ?? 0,
+      );
+
+  Map<String, dynamic> toJson() => {'size': size, 'pieces': pieces};
+}
+
 class CarpetPieceData {
   final double width;
   final double height;
@@ -85,6 +99,7 @@ class Product {
   final double foamWidth;
   final double foamThickness;
   final String pillowSize;
+  final List<SizeStock> sizeStocks;
   final double costPrice;
   final double sellingPrice;
   final int quantity;
@@ -122,6 +137,7 @@ class Product {
     this.foamWidth = 0,
     this.foamThickness = 0,
     this.pillowSize = '',
+    this.sizeStocks = const [],
     required this.costPrice,
     this.sellingPrice = 0,
     this.quantity = 0,
@@ -190,6 +206,10 @@ class Product {
       foamWidth: (json['foamWidth'] as num?)?.toDouble() ?? 0,
       foamThickness: (json['foamThickness'] as num?)?.toDouble() ?? 0,
       pillowSize: json['pillowSize']?.toString() ?? '',
+      sizeStocks: (json['sizeStocks'] as List?)
+              ?.map((e) => SizeStock.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       costPrice: (json['costPrice'] as num?)?.toDouble() ?? 0,
       sellingPrice: (json['sellingPrice'] as num?)?.toDouble() ?? 0,
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
@@ -230,6 +250,7 @@ class Product {
         'foamWidth': foamWidth,
         'foamThickness': foamThickness,
         'pillowSize': pillowSize,
+        'sizeStocks': sizeStocks.map((s) => s.toJson()).toList(),
         'costPrice': costPrice,
         'sellingPrice': sellingPrice,
         'lowStockThreshold': lowStockThreshold,

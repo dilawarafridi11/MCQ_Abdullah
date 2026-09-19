@@ -302,19 +302,27 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         );
       case 'foam':
         return _SectionCard(
-          title: 'Pieces',
+          title: p.sizeStocks.isEmpty ? 'Pieces' : 'Sizes (${p.sizeStocks.length})',
           icon: Icons.layers_outlined,
           children: [
-            _InfoRow(
-              icon: Icons.square_foot,
-              label: 'Dimensions',
-              value: p.foamLength > 0 || p.foamWidth > 0
-                  ? '${_dim(p.foamLength)}ft x ${_dim(p.foamWidth)}ft'
-                  : '—',
-            ),
-            if (p.foamThickness > 0)
-              _InfoRow(icon: Icons.vertical_align_center, label: 'Thickness', value: '${_dim(p.foamThickness)}in'),
-            _InfoRow(icon: Icons.inventory_2_outlined, label: 'Quantity', value: '${p.quantity} pieces'),
+            if (p.sizeStocks.isNotEmpty)
+              ...p.sizeStocks.map((s) => _InfoRow(
+                    icon: Icons.straighten,
+                    label: s.size,
+                    value: '${s.pieces} pcs',
+                  ))
+            else ...[
+              _InfoRow(
+                icon: Icons.square_foot,
+                label: 'Dimensions',
+                value: p.foamLength > 0 || p.foamWidth > 0
+                    ? '${_dim(p.foamLength)}ft x ${_dim(p.foamWidth)}ft'
+                    : '—',
+              ),
+              if (p.foamThickness > 0)
+                _InfoRow(icon: Icons.vertical_align_center, label: 'Thickness', value: '${_dim(p.foamThickness)}in'),
+              _InfoRow(icon: Icons.inventory_2_outlined, label: 'Quantity', value: '${p.quantity} pieces'),
+            ],
             if (p.costPrice > 0)
               _InfoRow(icon: Icons.attach_money, label: 'Cost / piece', value: Formatters.currency(p.costPrice)),
           ],

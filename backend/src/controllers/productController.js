@@ -100,7 +100,14 @@ const calcQuantityAndCost = (body) => {
     // costPrice is per meter (per-unit) so the same qty * costPrice / profit math holds.
     return { quantity: length, costPrice: Number(body.costPerMeter) || 0 };
   }
-  if (pt === 'foam' || pt === 'pillow') {
+  if (pt === 'foam') {
+    const sizes = Array.isArray(body.sizeStocks) ? body.sizeStocks : [];
+    const qty = sizes.length > 0
+      ? sizes.reduce((sum, s) => sum + (Number(s.pieces) || 0), 0)
+      : (colorStockQty !== null ? colorStockQty : Number(body.quantity) || 0);
+    return { quantity: qty, costPrice: Number(body.costPrice) || 0 };
+  }
+  if (pt === 'pillow') {
     const qty = colorStockQty !== null ? colorStockQty : Number(body.quantity) || 0;
     return { quantity: qty, costPrice: Number(body.costPrice) || 0 };
   }
@@ -115,7 +122,7 @@ const createProduct = asyncHandler(async (req, res) => {
     carpetWidth, carpetHeight, carpetPieces, carpetPiecesData, costPerSqft,
     costPerPiece, qaleenSizes,
     meterLength, costPerMeter,
-    foamLength, foamWidth, foamThickness, pillowSize,
+    foamLength, foamWidth, foamThickness, pillowSize, sizeStocks,
   } = req.body;
 
   if (!name) throw new ApiError(400, 'Product name is required.');
@@ -149,6 +156,7 @@ const createProduct = asyncHandler(async (req, res) => {
     foamWidth: foamWidth || 0,
     foamThickness: foamThickness || 0,
     pillowSize: pillowSize || '',
+    sizeStocks: sizeStocks || [],
     costPrice,
     sellingPrice: sellingPrice || 0,
     quantity,
@@ -189,7 +197,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     'carpetWidth', 'carpetHeight', 'carpetPieces', 'carpetPiecesData', 'costPerSqft',
     'costPerPiece', 'qaleenSizes',
     'meterLength', 'costPerMeter',
-    'foamLength', 'foamWidth', 'foamThickness', 'pillowSize',
+    'foamLength', 'foamWidth', 'foamThickness', 'pillowSize', 'sizeStocks',
   ];
   allowed.forEach((field) => {
     if (req.body[field] !== undefined) product[field] = req.body[field];
