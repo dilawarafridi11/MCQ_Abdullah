@@ -25,7 +25,7 @@ class LogoWatermark extends StatelessWidget {
           child: Opacity(
             opacity: opacity,
             child: Image.asset(
-              'lib/images/muallimlogo.png',
+              'lib/images/hayatlogo.png',
               width: size,
               height: size,
               fit: BoxFit.contain,

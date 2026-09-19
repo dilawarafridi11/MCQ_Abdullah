@@ -2,7 +2,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'MCQ';
-  static const String appFullName = 'Muallim Carpets';
+  static const String appFullName = 'Hayat Form';
   static const String appTagline = 'Business Management System';
   static const String appVersion = '1.0.0';
 

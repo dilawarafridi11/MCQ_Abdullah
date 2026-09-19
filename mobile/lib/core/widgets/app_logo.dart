@@ -7,7 +7,7 @@ class AppLogo extends StatelessWidget {
     super.key,
     this.size = 72,
     this.dark = false,
-    this.imagePath = 'lib/images/muallimlogo.png',
+    this.imagePath = 'lib/images/hayatlogo.png',
   });
 
   final double size;
@@ -39,7 +39,7 @@ class AppLogo extends StatelessWidget {
           ),
         ),
         Text(
-          'Muallim Carpets',
+          'Hayat Form',
           style: TextStyle(
             fontSize: size * 0.16,
             color: AppColors.accent,

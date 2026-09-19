@@ -17,7 +17,7 @@ class McqApp extends ConsumerWidget {
     final authState = ref.watch(authControllerProvider);
 
     return MaterialApp(
-      title: 'MCQ - Muallim Carpets',
+      title: 'Hayat Form',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

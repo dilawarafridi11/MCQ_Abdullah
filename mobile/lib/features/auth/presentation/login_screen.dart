@@ -255,7 +255,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       FadeTransition(
                         opacity: _logoFade,
                         child: Image.asset(
-                          'lib/images/muallimlogo.png',
+                          'lib/images/hayatlogo.png',
                           height: 210,
                           fit: BoxFit.contain,
                         ),

@@ -1337,7 +1337,7 @@ class _ShopTopBar extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Image.asset(
-            'lib/images/muallimlogo.png',
+            'lib/images/hayatlogo.png',
             width: 38,
             height: 38,
             fit: BoxFit.contain,

@@ -52,7 +52,7 @@ class PremiumBackground extends StatelessWidget {
       child: Opacity(
         opacity: watermarkOpacity,
         child: Image.asset(
-          'lib/images/muallimlogo.png',
+          'lib/images/hayatlogo.png',
           width: watermarkSize,
           height: watermarkSize,
           fit: BoxFit.contain,

@@ -258,7 +258,7 @@ class _LuxHeader extends ConsumerWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'lib/images/muallimlogo.png',
+                'lib/images/hayatlogo.png',
                 width: 42,
                 height: 42,
                 fit: BoxFit.contain,

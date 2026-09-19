@@ -1,0 +1,252 @@
+INFO         | Android emulator version 36.1.9.0 (build_id 13823996) (CL:N/A)
+INFO         | Graphics backend: gfxstream
+INFO         | Found systemPath C:\Users\T460s\AppData\Local\Android\Sdk\system-images\android-36\google_apis_ps16k\x86_64\
+I0919 05:55:14.373107   24720 opengles.cpp:291] android_startOpenglesRenderer: gpu info
+I0919 05:55:14.373233   24720 opengles.cpp:292] GPU #1
+  Make: 10de
+  Model: NVIDIA GeForce 940MX
+  Device ID: 134d
+
+WARNING      | Please update the emulator to one that supports the feature(s): VulkanVirtualQueue
+INFO         | IPv4 server found: 8.8.8.8
+INFO         | Ignore IPv6 address: 7036:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 7036:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 7036:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 683c:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 683c:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 683c:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 8042:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 8042:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 8042:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 7050:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 7050:4909:9a02:0:7036:4909:9a02:0
+INFO         | Ignore IPv6 address: 7050:4909:9a02:0:7036:4909:9a02:0
+INFO         | Guest GLES Driver: Auto (ext controls)
+library_mode host gpu mode host
+INFO         | emuglConfig_get_vulkan_hardware_gpu_support_info: Found physical GPU 'NVIDIA GeForce 940MX', type: VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU, apiVersion: 1.3.289, driverVersion: 566.14
+
+INFO         | emuglConfig_get_vulkan_hardware_gpu_support_info: Found physical GPU 'Intel(R) HD Graphics 530', type: VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU, apiVersion: 1.2.187, driverVersion: 0.402.1673
+
+INFO         | Enabled VulkanAllocateHostMemory feature for gpu vendor NVIDIA GeForce 940MX on Linux
+
+INFO         | GPU device local memory = 2215MB
+INFO         | Checking system compatibility:
+INFO         |   Checking: hasCompatibleHypervisor
+INFO         |      Ok: Hypervisor compatibility to run avd: `Pixel_6` are met
+INFO         |   Checking: hasSufficientSystem
+INFO         |      Ok: System requirements to run avd: `Pixel_6` are met
+INFO         |   Checking: hasSufficientHwGpu
+INFO         |      Ok: Hardware GPU requirements to run avd: `Pixel_6` are passed
+INFO         |   Checking: hasSufficientDiskSpace
+INFO         |      Ok: Disk space requirements to run avd: `Pixel_6` are met
+INFO         | Critical: Failed to load opengl32sw (The specified module could not be found.) (:0, )
+INFO         | Warning: Software OpenGL failed. Falling back to system OpenGL. (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_btn_xr_environment_living_room_day_clicked() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_btn_xr_environment_living_room_night_clicked() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_new_posture_requested(int) (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_dismiss_posture_selection_dialog() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_new_resizable_requested(PresetEmulatorSizeType) (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_dismiss_resizable_dialog() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_xr_environment_mode_changed(int) (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_dismiss_xr_environment_mode_dialog() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_xr_input_mode_changed(int) (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_dismiss_xr_input_mode_dialog() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_sleep_timer_done() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_unfold_timer_done() (:0, )
+INFO         | Storing crashdata in: C:\Users\T460s\AppData\Local\Temp\\AndroidEmulator\emu-crash-36.1.9.db, detection is enabled for process: 7960
+INFO         | Initializing hardware OpenGLES emulation support
+INFO         | HealthMonitor disabled.
+INFO      I0919 05:55:15.045579   24720 userspace-boot-properties.cpp:766] Userspace boot properties:
+I0919 05:55:15.045610   24720 userspace-boot-properties.cpp:770]   androidboot.boot_devices=pci0000:00/0000:00:03.0 pci0000:00/0000:00:06.0
+I0919 05:55:15.045620   24720 userspace-boot-properties.cpp:770]   androidboot.dalvik.vm.heapsize=512m
+I0919 05:55:15.045627   24720 userspace-boot-properties.cpp:770]   androidboot.debug.hwui.renderer=skiagl
+I0919 05:55:15.045634   24720 userspace-boot-properties.cpp:770]   androidboot.debug.sf.nobootanimation=1
+I0919 05:55:15.045642   24720 userspace-boot-properties.cpp:770]   androidboot.hardware=ranchu
+I0919 05:55:15.045648   24720 userspace-boot-properties.cpp:770]   androidboot.hardware.gltransport=pipe
+I0919 05:55:15.045660   24720 userspace-boot-properties.cpp:770]   androidboot.hardware.vulkan=ranchu
+I0919 05:55:15.045667   24720 userspace-boot-properties.cpp:770]   androidboot.logcat=*:V
+I0919 05:55:15.045673   24720 userspace-boot-properties.cpp:770]   androidboot.opengles.version=196609
+I0919 05:55:15.045681   24720 userspace-boot-properties.cpp:770]   androidboot.qemu=1
+I0919 05:55:15.045688   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.adb.pubkey=QAAAAJ1ECFBLnrfT5rwqcYHkmX7TmPsyyCBnq48KqyOzMKuu9YYjCPGKxWr+fgSyQ/M4d20SJxiFz3eQgXTXJXRCPW1EpsmD7d0ESwRUnH8VeD1UJ1o7+em4O+483++5DeEWDwzGh3kl+6PvobKrztkN6+qodfDq/XBl16dr+2xO/6v4SvMQaQD3xHiKe2pRqeCZ3a4g/e7nZ7wa/rMqyOKmxNP62zDZC6MgBfZ/ro3jxi2SpoX3cGP7d2ham+SNyOz8KLwe0GLihCrn19Twe3ED3JF0FSN6SX3knMoXqXj0hVKU32bw5RX5DF1/isdu/Pi6gJUHqWOCc5Bo+jexK4vFBMwkI6K2QoLtcEZ9pU2MAnsP6fq2qlqP1BJrdkcP6vNrnQtj9B2yn/Of4g3+gbeZ1WYSVnHni6GYxHB9fbdyOJb9InYZuw3orI6r8vxtFYTeFZnv/tvZwx/9Zkv5RAZnLj9Un7Iq96jChTLW/u/hGq+Qc52j3+mVCjILsdMFTwahKua3576yrAoGonSvDvg/+FA/k+UAEvt7ErWCGZ4fwHPK2WV1eblu9zEVfhyG4+FEg5+db5rRcSDp5O3Y8Q3zTboebam8POeRchaV01L+nvS5RS7YTGWErgqUSqiaQLc7BgTQTJfOEiq6M5BjT+zRLV7NyUMmCrLvmjb7SyMUIYumnhV+ogEAAQA= @unknown
+I0919 05:55:15.045697   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.avd_name=Pixel_6
+I0919 05:55:15.045706   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.camera_hq_edge_processing=0
+I0919 05:55:15.045715   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.camera_protocol_ver=1
+I0919 05:55:15.045721   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.cpuvulkan.version=4202496
+I0919 05:55:15.045728   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.gltransport.drawFlushInterval=800
+I0919 05:55:15.045734   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.gltransport.name=pipe
+I0919 05:55:15.045741   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.hwcodec.avcdec=2
+I0919 05:55:15.045747   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.hwcodec.hevcdec=2
+I0919 05:55:15.045754   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.hwcodec.vpxdec=2
+I0919 05:55:15.045760   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.settings.system.screen_off_timeout=2147483647
+I0919 05:55:15.045767   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.virtiowifi=1
+I0919 05:55:15.045774   24720 userspace-boot-properties.cpp:770]   androidboot.qemu.vsync=60
+I0919 05:55:15.045780   24720 userspace-boot-properties.cpp:770]   androidboot.serialno=EMULATOR36X1X9X0
+I0919 05:55:15.045786   24720 userspace-boot-properties.cpp:770]   androidboot.vbmeta.digest=0e65503c1130973d10b38ccd0b42e95ab1aefbb25871d4214d896c339e128f52
+I0919 05:55:15.045793   24720 userspace-boot-properties.cpp:770]   androidboot.vbmeta.hash_alg=sha256
+I0919 05:55:15.045855   24720 userspace-boot-properties.cpp:770]   androidboot.vbmeta.size=6848
+I0919 05:55:15.045865   24720 userspace-boot-properties.cpp:770]   androidboot.veritymode=enforcing
+   | SharedLibrary::open for [vulkan-1.dll]
+INFO         | SharedLibrary::open for [vulkan-1.dll]: not found in map, open for the first time
+INFO         | SharedLibrary::open for [vulkan-1.dll] (win32): call LoadLibrary
+INFO         | SharedLibrary::open succeeded for [vulkan-1.dll]. File name: [C:\Windows\SYSTEM32\vulkan-1.dll]
+INFO         | Added library: vulkan-1.dll
+INFO         | Selecting Vulkan device: NVIDIA GeForce 940MX, Version: 1.3.289
+INFO         | Disabling sparse binding feature support
+INFO         | SharedLibrary::open for [opengl32.dll]: not found in map, open for the first time
+INFO         | SharedLibrary::open for [opengl32.dll] (win32): call LoadLibrary
+INFO         | SharedLibrary::open succeeded for [opengl32.dll]. File name: [C:\Windows\SYSTEM32\opengl32.DLL]
+INFO         | SharedLibrary::open for [libshadertranslator.dll]: not found in map, open for the first time
+INFO         | SharedLibrary::open for [libshadertranslator.dll] (win32): call LoadLibrary
+INFO         | SharedLibrary::open succeeded for [libshadertranslator.dll]. File name: [C:\Users\T460s\AppData\Local\Android\Sdk\emulator\lib64\libshadertranslator.dll]
+INFO         | Initializing VkEmulation features:
+INFO         |     glInteropSupported: true
+INFO         |     useDeferredCommands: true
+INFO         |     createResourceWithRequirements: true
+INFO         |     useVulkanComposition: false
+INFO         |     useVulkanNativeSwapchain: false
+INFO         |     enable guestRenderDoc: false
+INFO         |     ASTC LDR emulation mode: Gpu
+INFO         |     enable ETC2 emulation: true
+INFO         |     enable Ycbcr emulation: false
+INFO         |     guestVulkanOnly: false
+INFO         |     useDedicatedAllocations: false
+INFO         | Graphics Adapter Vendor Google (NVIDIA Corporation)
+INFO         | Graphics Adapter Android Emulator OpenGL ES Translator (NVIDIA GeForce 940MX/PCIe/SSE2)
+INFO         | Graphics API Version OpenGL ES 3.0 (4.5.0 NVIDIA 566.14)
+INFO         | Graphics API Extensions GL_OES_EGL_sync GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_depth24 GL_OES_depth32 GL_OES_element_index_uint GL_OES_texture_float GL_OES_texture_float_linear GL_OES_compressed_paletted_texture GL_OES_compressed_ETC1_RGB8_texture GL_OES_depth_texture GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_packed_depth_stencil GL_OES_vertex_half_float GL_OES_texture_npot GL_OES_rgb8_rgba8 GL_OVR_multiview2 GL_EXT_multiview_texture_multisample GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_texture_format_BGRA8888 GL_APPLE_texture_format_BGRA8888 GL_EXT_texture_buffer 
+INFO         | Graphics Device Extensions N/A
+INFO         | Sending adb public key [QAAAAJ1ECFBLnrfT5rwqcYHkmX7TmPsyyCBnq48KqyOzMKuu9YYjCPGKxWr+fgSyQ/M4d20SJxiFz3eQgXTXJXRCPW1EpsmD7d0ESwRUnH8VeD1UJ1o7+em4O+483++5DeEWDwzGh3kl+6PvobKrztkN6+qodfDq/XBl16dr+2xO/6v4SvMQaQD3xHiKe2pRqeCZ3a4g/e7nZ7wa/rMqyOKmxNP62zDZC6MgBfZ/ro3jxi2SpoX3cGP7d2ham+SNyOz8KLwe0GLihCrn19Twe3ED3JF0FSN6SX3knMoXqXj0hVKU32bw5RX5DF1/isdu/Pi6gJUHqWOCc5Bo+jexK4vFBMwkI6K2QoLtcEZ9pU2MAnsP6fq2qlqP1BJrdkcP6vNrnQtj9B2yn/Of4g3+gbeZ1WYSVnHni6GYxHB9fbdyOJb9InYZuw3orI6r8vxtFYTeFZnv/tvZwx/9Zkv5RAZnLj9Un7Iq96jChTLW/u/hGq+Qc52j3+mVCjILsdMFTwahKua3576yrAoGonSvDvg/+FA/k+UAEvt7ErWCGZ4fwHPK2WV1eblu9zEVfhyG4+FEg5+db5rRcSDp5O3Y8Q3zTboebam8POeRchaV01L+nvS5RS7YTGWErgqUSqiaQLc7BgTQTJfOEiq6M5BjT+zRLV7NyUMmCrLvmjb7SyMUIYumnhV+ogEAAQA= @unknown]
+AEHD is operational
+host doesn't support requested feature: CPUID.01H:ECX.xsave [bit 26]
+host doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+netsimd I 09-19 12:55:15.166 daemon\src\rust_main.rs:100 - netsim artifacts path: "C:\\Users\\T460s\\AppData\\Local\\Temp\\netsimd"
+netsimd I 09-19 12:55:15.166 daemon\src\rust_main.rs:103 - NetsimdArgs {
+    fd_startup_str: None,
+    no_cli_ui: true,
+    no_web_ui: true,
+    pcap: false,
+    disable_address_reuse: false,
+    hci_port: None,
+    connector_instance: None,
+    instance: None,
+    logtostderr: false,
+    dev: false,
+    forward_host_mdns: false,
+    vsock: None,
+    config: None,
+    host_dns: Some(
+        "8.8.8.8",
+    ),
+    http_proxy: None,
+    wifi_tap: None,
+    wifi: None,
+    test_beacons: false,
+    no_test_beacons: false,
+    no_shutdown: false,
+    verbose: false,
+    version: false,
+    rssi: None,
+}
+host doesn't support requested feature: CPUID.01H:ECX.xsave [bit 26]
+host doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+host doesn't support requested feature: CPUID.01H:ECX.xsave [bit 26]
+host doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+host doesn't support requested feature: CPUID.01H:ECX.xsave [bit 26]
+host doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+INFO         | Monitoring duration of emulator setup.
+WARNING      | The emulator now requires a signed jwt token for gRPC access! Use the -grpc flag if you really want an open unprotected grpc port
+INFO         | Using security allow list from: C:\Users\T460s\AppData\Local\Android\Sdk\emulator\lib\emulator_access.json
+WARNING      | *** Basic token auth should only be used by android-studio ***
+INFO         | The active JSON Web Key Sets can be found here: C:\Users\T460s\AppData\Local\Temp\avd\running\7960\jwks\8d4f8e41-9309-4536-8be2-1d32974b0711\active.jwk
+INFO         | Scanning C:\Users\T460s\AppData\Local\Temp\avd\running\7960\jwks\8d4f8e41-9309-4536-8be2-1d32974b0711 for jwk keys.
+INFO         | Started GRPC server at 127.0.0.1:8554, security: Local, auth: +token
+INFO         | Advertising in: C:\Users\T460s\AppData\Local\Temp\avd\running\pid_7960.ini
+INFO         | Setting display: 0 configuration to: 1080x2400, dpi: 420x420 
+INFO         | setDisplayActiveConfig 0
+INFO         | Checking system compatibility:
+INFO         |   Checking: hasCompatibleHypervisor
+INFO         |      Ok: Hypervisor compatibility to run avd: `Pixel_6` are met
+INFO         |   Checking: hasSufficientSystem
+INFO         |      Ok: System requirements to run avd: `Pixel_6` are met
+INFO         |   Checking: hasSufficientHwGpu
+INFO         |      Ok: Hardware GPU requirements to run avd: `Pixel_6` are passed
+INFO         |   Checking: hasSufficientDiskSpace
+INFO         |      Ok: Disk space requirements to run avd: `Pixel_6` are met
+USER_INFO    | Emulator is performing a full startup. This may take upto two minutes, or more.
+INFO         | OpenGL Vendor=[Google (NVIDIA Corporation)]
+INFO         | OpenGL Renderer=[Android Emulator OpenGL ES Translator (NVIDIA GeForce 940MX/PCIe/SSE2)]
+INFO         | OpenGL Version=[OpenGL ES 3.0 (4.5.0 NVIDIA 566.14)]
+WARNING      | adb command 'C:\Users\T460s\AppData\Local\Android\Sdk\platform-tools\adb.exe -s emulator-5554 shell am start-foreground-service -e meter on com.android.emulator.radio.config/.MeterService ' failed: 'adb.exe: device offline'
+INFO         | Activated packet streamer for bluetooth emulation
+INFO         | Activated packet streamer for uwb emulation
+INFO         | Critical: UpdateLayeredWindowIndirect failed for ptDst=(511, -920), size=(375x26), dirty=(375x26 0, 0) (A device attached to the system is not functioning.) (:0, )
+netsimd I 09-19 12:55:55.911 daemon\src\rust_main.rs:100 - netsim artifacts path: "C:\\Users\\T460s\\AppData\\Local\\Temp\\netsimd"
+netsimd I 09-19 12:55:55.911 daemon\src\rust_main.rs:103 - NetsimdArgs {
+    fd_startup_str: None,
+    no_cli_ui: true,
+    no_web_ui: true,
+    pcap: false,
+    disable_address_reuse: false,
+    hci_port: None,
+    connector_instance: None,
+    instance: None,
+    logtostderr: false,
+    dev: false,
+    forward_host_mdns: false,
+    vsock: None,
+    config: None,
+    host_dns: Some(
+        "8.8.8.8",
+    ),
+    http_proxy: None,
+    wifi_tap: None,
+    wifi: None,
+    test_beacons: false,
+    no_test_beacons: false,
+    no_shutdown: false,
+    verbose: false,
+    version: false,
+    rssi: None,
+}
+INFO         | Boot completed in 82021 ms
+INFO         | Increasing screen off timeout, logcat buffer size to 2M.
+INFO         | IPv4 server found: 8.8.8.8
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | IPv4 server found: 8.8.8.8
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | IPv4 server found: 8.8.8.8
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0e0:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: 98e6:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: b0ec:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Ignore IPv6 address: a0fa:a3d3:9a02:0:a0e0:a3d3:9a02:0
+INFO         | Critical: UpdateLayeredWindowIndirect failed for ptDst=(511, -920), size=(375x26), dirty=(375x26 0, 0) (A device attached to the system is not functioning.) (:0, )
