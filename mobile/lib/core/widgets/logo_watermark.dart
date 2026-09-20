@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Reusable Muallim brand watermark rendered from the app logo asset.
+/// Reusable Hayat Foam brand watermark rendered from the app logo asset.
 class LogoWatermark extends StatelessWidget {
   const LogoWatermark({
     super.key,

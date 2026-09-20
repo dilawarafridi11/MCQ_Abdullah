@@ -248,7 +248,7 @@ class _LuxHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final firstName = (user?.name ?? '').split(' ').first;
-    final scope = isAdmin ? 'Muallim HQ' : (user?.assignedShopName ?? 'Manager');
+    final scope = isAdmin ? 'Hayat Foam' : (user?.assignedShopName ?? 'Manager');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +270,7 @@ class _LuxHeader extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'MUALLIM CARPETS',
+                    'HAYAT FOAM',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,

@@ -1349,7 +1349,7 @@ class _ShopTopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'MUALLIM CARPETS',
+                'HAYAT FOAM',
                 style: GoogleFonts.poppins(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,

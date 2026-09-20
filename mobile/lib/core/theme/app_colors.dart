@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Muallim Carpet & Qaleen brand palette.
+/// Hayat Foam brand palette.
 /// Luxury Gold (#D4AF37) · Deep Black (#121212) · Premium Red (#8B1E1E) · Cream (#F8F6F1)
 class AppColors {
   AppColors._();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Compact Muallim brand mark for AppBar leading / titles.
+/// Compact Hayat Foam brand mark for AppBar leading / titles.
 class AppBarBrand extends StatelessWidget {
   const AppBarBrand({super.key, this.size = 30, this.showText = true});
 
