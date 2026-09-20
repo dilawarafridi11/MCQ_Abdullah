@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
@@ -10,6 +14,7 @@ import '../../../core/widgets/status_views.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../models/sale.dart';
 import '../providers/sale_providers.dart';
+import '../services/invoice_pdf.dart';
 
 class SalesListScreen extends ConsumerWidget {
   const SalesListScreen({super.key});
@@ -220,7 +225,16 @@ class SaleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(sale.invoiceNo)),
+      appBar: AppBar(
+        title: Text(sale.invoiceNo),
+        actions: [
+          IconButton(
+            tooltip: 'Share invoice',
+            onPressed: () => _shareInvoice(context, sale),
+            icon: const Icon(Icons.ios_share),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -285,10 +299,18 @@ class SaleDetailScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(item.productName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                Text(
-                                  '${item.quantity} x ${Formatters.currency(item.unitPrice)}',
-                                  style: theme.textTheme.bodySmall,
-                                ),
+                                if (item.isFoam) ...[
+                                  if (item.foamQty > 0)
+                                    _QtyLine(label: 'Foam', qty: item.foamQty, price: item.unitPrice),
+                                  if (item.pillowQty > 0)
+                                    _QtyLine(label: 'Pillows', qty: item.pillowQty, price: item.unitPrice),
+                                  if (item.coverQty > 0)
+                                    _QtyLine(label: 'Foam Covers', qty: item.coverQty, price: item.unitPrice),
+                                ] else
+                                  Text(
+                                    '${item.quantity} x ${Formatters.currency(item.unitPrice)}',
+                                    style: theme.textTheme.bodySmall,
+                                  ),
                               ],
                             ),
                           ),
@@ -330,6 +352,43 @@ class SaleDetailScreen extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+Future<void> _shareInvoice(BuildContext context, Sale sale) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final bytes = await InvoicePdf.build(sale);
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/Invoice_${sale.invoiceNo}.pdf');
+      await file.writeAsBytes(bytes);
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'application/pdf')],
+          text: 'Invoice ${sale.invoiceNo} — Hayat Foam',
+        ),
+      );
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Could not share invoice: $e')));
+    }
+  }
+}
+
+class _QtyLine extends StatelessWidget {
+  const _QtyLine({required this.label, required this.qty, required this.price});
+
+  final String label;
+  final int qty;
+  final double price;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: Text(
+        '$label: $qty x ${Formatters.currency(price)}',
+        style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
       ),
     );
   }

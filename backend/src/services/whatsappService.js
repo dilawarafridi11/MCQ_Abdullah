@@ -27,99 +27,141 @@ const normalizePhone = (phone, countryCode = '92') => {
 
 const generateSaleReceiptPDF = async (sale) => {
   const shop = sale.shop && sale.shop.name ? sale.shop : await Shop.findById(sale.shop).lean();
-  const shopName = (shop && shop.name) || 'Muallim Carpets';
+  const shopName = (shop && shop.name) || 'Hayat Foam';
+  const GOLD = '#D4AF37';
+  const INK = '#1A1A2E';
+  const MUTED = '#6B7280';
+  const LIGHT = '#F7F4EA';
+  const LINE = '#E5E5EA';
 
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: 'A4', margin: 40 });
+    const doc = new PDFDocument({ size: 'A4', margin: 28 });
     const chunks = [];
     doc.on('data', (c) => chunks.push(c));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    // Header
-    doc.fontSize(20).font('Helvetica-Bold').fillColor('#111111').text('MUALLIM CARPETS', { align: 'center' });
-    doc.fontSize(10).font('Helvetica').fillColor('#555555').text('Sale Receipt / Invoice', { align: 'center' });
-    doc.fontSize(9).text(shopName, { align: 'center' });
-    doc.moveDown(0.5);
-    doc.moveTo(40, doc.y).lineTo(555, doc.y).stroke('#D4AF37');
-    doc.moveDown(0.8);
+    const margin = 28;
+    const width = 595.28 - margin * 2;
 
-    // Invoice meta
-    doc.fontSize(10).font('Helvetica-Bold');
-    doc.text(`Invoice No: ${sale.invoiceNo}`, 40, doc.y);
-    doc.text(`Date: ${fmtDate(sale.createdAt || new Date())}`, 300, doc.y - 12);
+    // ---- Bordered shell ----
+    doc.roundedRect(margin, margin, width, 20, 10).fill(INK);
+    doc.rect(margin, margin + 20, width, 1).fill(GOLD);
+
+    // ---- Header ----
+    doc.roundRect(margin, margin + 22, width, 78, 0).fill('#FFFFFF');
+    doc.font('Helvetica-Bold').fontSize(20).fillColor(INK).text('HAYAT FOAM', margin + 22, margin + 34);
+    doc.font('Helvetica').fontSize(9).fillColor(MUTED).text('PREMIUM FOAM & MATTRESS SOLUTIONS', margin + 22, margin + 62, { characterSpacing: 1 });
+    doc.font('Helvetica').fontSize(10).fillColor(MUTED).text(shopName, margin + 22, margin + 76);
+    doc.font('Helvetica-Bold').fontSize(13).fillColor(GOLD).text('INVOICE', width / 2 + margin - 30, margin + 34, { characterSpacing: 2 });
+    doc.font('Helvetica-Bold').fontSize(12).fillColor(INK).text(sale.invoiceNo, width / 2 + margin - 30, margin + 52);
+    doc.font('Helvetica').fontSize(9).fillColor(MUTED).text(fmtDate(sale.createdAt || new Date()), width / 2 + margin - 30, margin + 74);
+    doc.rect(margin, margin + 100, width, 1).fill(LINE);
+    doc.y = margin + 116;
+
+    // ---- Customer & payment ----
+    doc.font('Helvetica').fontSize(8).fillColor(MUTED).text('BILLED TO', { characterSpacing: 1.4 });
+    doc.moveDown(0.3);
+    doc.font('Helvetica-Bold').fontSize(11).fillColor(INK).text(sale.customerName || 'Walk-in Customer');
+    if (sale.customerPhone) {
+      doc.font('Helvetica').fontSize(9).fillColor(MUTED).text(sale.customerPhone);
+    }
     doc.moveDown(0.6);
-    doc.font('Helvetica').fillColor('#333333');
-    doc.text(`Customer: ${sale.customerName || 'Walk-in Customer'}`);
-    if (sale.customerPhone) doc.text(`Phone: ${sale.customerPhone}`);
-    doc.text(`Payment: ${(sale.paymentMethod || 'cash').toUpperCase()}`);
-    doc.moveDown(0.8);
+    doc.font('Helvetica').fontSize(8).fillColor(MUTED).text('PAYMENT', { characterSpacing: 1.4 });
+    doc.moveDown(0.3);
+    doc.font('Helvetica-Bold').fontSize(9).fillColor(GOLD);
+    const method = (sale.paymentMethod || 'cash').toUpperCase();
+    const pw = doc.widthOfString(method) + 14;
+    doc.roundRect(margin, doc.y - 9, pw + 8, 14, 7).stroke(GOLD);
+    doc.text(method, margin + 4, doc.y);
+    doc.y += 6;
 
-    // Items table
-    const x0 = 40;
-    const tableW = 515;
-    const headers = ['Product', 'Qty', 'Unit Price', 'Total'];
-    const cols = [225, 70, 120, 100];
-    const colWidths = cols.map((w) => (tableW * w) / tableW);
-    const rows = (sale.items || []).map((it) => [
-      it.productName || '-',
-      `${it.quantity}`,
-      currency(it.unitPrice),
-      currency(it.totalAmount),
-    ]);
+    if (sale.createdBy && sale.createdBy.name) {
+      doc.moveDown(0.5);
+      doc.font('Helvetica').fontSize(8).fillColor(MUTED).text('HANDLED BY', { characterSpacing: 1.4 });
+      doc.moveDown(0.3);
+      doc.font('Helvetica').fontSize(9).fillColor(MUTED).text(sale.createdBy.name);
+    }
 
-    doc.font('Helvetica-Bold').fontSize(9).fillColor('#111111');
+    doc.moveDown(1);
+    doc.rect(margin, doc.y, width, 1).fill(LINE);
+    doc.y += 8;
+
+    // ---- Items table ----
+    const x0 = margin;
+    const tableW = width;
+    const cols = [tableW * 0.46, tableW * 0.16, tableW * 0.19, tableW * 0.19];
+    const headers = ['PRODUCT', 'QTY', 'UNIT PRICE', 'TOTAL'];
+    doc.fillColor(GOLD).rect(x0, doc.y, tableW, 22).fill();
     let x = x0;
     headers.forEach((h, i) => {
-      doc.text(h, x + 4, doc.y, { width: colWidths[i] - 8 });
-      x += colWidths[i];
+      doc.font('Helvetica-Bold').fontSize(8.5).fillColor(INK);
+      doc.text(h, x + 8, doc.y + 7, { width: cols[i] - 8, align: i === 0 ? 'left' : 'right' });
+      x += cols[i];
     });
-    doc.moveDown(0.1);
-    doc.moveTo(x0, doc.y).lineTo(x0 + tableW, doc.y).stroke('#CCCCCC');
-    doc.moveDown(0.3);
+    doc.y += 24;
 
-    doc.font('Helvetica').fontSize(9).fillColor('#333333');
-    for (const row of rows) {
-      if (doc.y > 750) doc.addPage();
+    const drawRow = (cells, { font = 'Helvetica', size = 9, color = INK, bg = null, padTop = 5, padBottom = 5, indent = 0 }) => {
+      if (doc.y > 740) doc.addPage();
+      if (bg) { doc.fillColor(bg).rect(x0, doc.y - 2, tableW, 20).fill(); }
+      doc.font(font).fontSize(size).fillColor(color);
       x = x0;
-      row.forEach((cell, i) => {
-        doc.text(cell, x + 4, doc.y, { width: colWidths[i] - 8 });
-        x += colWidths[i];
+      cells.forEach((cell, i) => {
+        doc.text(cell, x + 8 + indent, doc.y, { width: cols[i] - 8 - indent, align: i === 0 ? 'left' : 'right' });
+        x += cols[i];
       });
-      doc.moveDown(0.25);
-    }
-    doc.moveTo(x0, doc.y).lineTo(x0 + tableW, doc.y).stroke('#DDDDDD');
-    doc.moveDown(0.8);
+      doc.moveDown(1);
+    };
 
-    // Totals
+    (sale.items || []).forEach((it, idx) => {
+      const even = idx % 2 === 0 ? LIGHT : '#FFFFFF';
+      const units = currency(it.unitPrice);
+      if (it.foamQty || it.pillowQty || it.coverQty) {
+        drawRow([it.productName || '-', '', '', ''], { font: 'Helvetica-Bold', size: 9.5, bg: even });
+        if (it.foamQty) {
+          drawRow([`    · Foam`, `${it.foamQty}`, units, currency(it.foamQty * it.unitPrice)], { bg: even, color: '#555555', size: 8.5, indent: 0 });
+        }
+        if (it.pillowQty) {
+          drawRow([`    · Pillows`, `${it.pillowQty}`, units, currency(it.pillowQty * it.unitPrice)], { bg: even, color: '#555555', size: 8.5 });
+        }
+        if (it.coverQty) {
+          drawRow([`    · Foam Covers`, `${it.coverQty}`, units, currency(it.coverQty * it.unitPrice)], { bg: even, color: '#555555', size: 8.5 });
+        }
+        doc.rect(x0, doc.y + 2, tableW, 0.6).fill(LINE);
+        doc.y += 8;
+      } else {
+        drawRow([it.productName || '-', `${it.quantity}`, units, currency(it.totalAmount)], { bg: even });
+      }
+    });
+
+    doc.rect(x0, doc.y + 4, tableW, 0.8).fill(GOLD);
+    doc.y += 16;
+
+    // ---- Totals ----
     const totals = [
-      ['Subtotal', currency(sale.subtotal)],
-      ...(sale.discount > 0 ? [['Discount', `- ${currency(sale.discount)}`]] : []),
-      ['Total', currency(sale.totalAmount)],
-      ['Paid', currency(sale.paidAmount)],
-      ...(sale.dueAmount > 0 ? [['Due', currency(sale.dueAmount)]] : [['Due', currency(0)]]),
+      ['Subtotal', currency(sale.subtotal), false],
+      ...(sale.discount > 0 ? [['Discount', `- ${currency(sale.discount)}`, false]] : []),
+      ['Total', currency(sale.totalAmount), true],
+      ['Paid', currency(sale.paidAmount), false],
+      ['Due', currency(sale.dueAmount), sale.dueAmount > 0],
     ];
-    doc.font('Helvetica').fontSize(10).fillColor('#333333');
-    for (const [label, value] of totals) {
-      doc.font(label === 'Total' ? 'Helvetica-Bold' : 'Helvetica')
-        .fillColor(label === 'Total' ? '#111111' : '#333333');
-      doc.text(label, 300, doc.y);
-      doc.text(value, 430, doc.y - 11, { width: 165, align: 'right' });
-      if (label === 'Total' || (label === 'Paid')) doc.moveDown(0.2);
+    for (const [label, value, strong] of totals) {
+      doc.font(strong ? 'Helvetica-Bold' : 'Helvetica').fontSize(strong ? 12 : 10.5);
+      doc.fillColor(strong ? INK : MUTED).text(label.toUpperCase(), x0 + 300, doc.y, { width: 120, align: 'right' });
+      doc.fillColor(strong ? GOLD : INK).text(value, x0 + 300, doc.y - 11, { width: tableW - 300, align: 'right' });
+      doc.moveDown(0.5);
     }
 
     if (sale.notes) {
       doc.moveDown(0.6);
-      doc.font('Helvetica').fontSize(9).fillColor('#666666').text(`Notes: ${sale.notes}`);
+      doc.fillColor(MUTED).font('Helvetica').fontSize(9);
+      doc.text(`Notes: ${sale.notes}`);
     }
 
     doc.moveDown(1.2);
-    doc.moveTo(40, doc.y).lineTo(555, doc.y).stroke('#D4AF37');
-    doc.moveDown(0.4);
-    doc.fontSize(8).font('Helvetica').fillColor('#888888').text(
-      'Thank you for shopping with Muallim Carpets!',
-      { align: 'center' }
-    );
+    doc.roundedRect(margin, doc.y, width, 34, 8).fill(INK);
+    doc.fillColor(GOLD).font('Helvetica-Bold').fontSize(10).text('THANK YOU FOR SHOPPING WITH HAYAT FOAM!', margin + 14, doc.y - 13, { width: width - 28, align: 'center', characterSpacing: 1 });
+    doc.fillColor('#BBBBBB').font('Helvetica').fontSize(8).text('Invoice generated by MCQ Business Management System', margin + 14, doc.y + 12, { width: width - 28, align: 'center' });
 
     doc.end();
   });
@@ -185,7 +227,7 @@ const sendWhatsAppReceipt = async (sale, phone) => {
     const filename = `Invoice_${sale.invoiceNo}.pdf`;
     const buffer = await generateSaleReceiptPDF(sale);
     const mediaId = await uploadMedia(buffer, filename);
-    await sendDocumentMessage(to, mediaId, filename, `Invoice ${sale.invoiceNo} - Muallim Carpets. Thank you!`);
+    await sendDocumentMessage(to, mediaId, filename, `Invoice ${sale.invoiceNo} - Hayat Foam. Thank you!`);
     return { attempted: true, sent: true, reason: 'sent', error: null };
   } catch (err) {
     return { attempted: true, sent: false, reason: 'error', error: err.message };

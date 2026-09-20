@@ -18,16 +18,26 @@ class ColorStock {
   final String color;
   final int sets;
   final int pieces;
+  final int quantity;
 
-  const ColorStock({required this.color, this.sets = 0, this.pieces = 0});
+  const ColorStock({
+    required this.color,
+    this.sets = 0,
+    this.pieces = 0,
+    this.quantity = 0,
+  });
 
   factory ColorStock.fromJson(Map<String, dynamic> json) => ColorStock(
         color: json['color']?.toString() ?? '',
         sets: (json['sets'] as num?)?.toInt() ?? 0,
         pieces: (json['pieces'] as num?)?.toInt() ?? 0,
+        quantity: (json['quantity'] as num?)?.toInt() ?? 0,
       );
 
-  Map<String, dynamic> toJson() => {'color': color, 'sets': sets, 'pieces': pieces};
+  int get onHand => quantity > 0 ? quantity : pieces;
+
+  Map<String, dynamic> toJson() =>
+      {'color': color, 'sets': sets, 'pieces': pieces, if (quantity > 0) 'quantity': quantity};
 }
 
 class SizeStock {
@@ -100,6 +110,8 @@ class Product {
   final double foamThickness;
   final String pillowSize;
   final List<SizeStock> sizeStocks;
+  final int pillowStock;
+  final int coverStock;
   final double costPrice;
   final double sellingPrice;
   final int quantity;
@@ -138,6 +150,8 @@ class Product {
     this.foamThickness = 0,
     this.pillowSize = '',
     this.sizeStocks = const [],
+    this.pillowStock = 0,
+    this.coverStock = 0,
     required this.costPrice,
     this.sellingPrice = 0,
     this.quantity = 0,
@@ -210,6 +224,8 @@ class Product {
               ?.map((e) => SizeStock.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      pillowStock: (json['pillowStock'] as num?)?.toInt() ?? 0,
+      coverStock: (json['coverStock'] as num?)?.toInt() ?? 0,
       costPrice: (json['costPrice'] as num?)?.toDouble() ?? 0,
       sellingPrice: (json['sellingPrice'] as num?)?.toDouble() ?? 0,
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
@@ -251,6 +267,8 @@ class Product {
         'foamThickness': foamThickness,
         'pillowSize': pillowSize,
         'sizeStocks': sizeStocks.map((s) => s.toJson()).toList(),
+        'pillowStock': pillowStock,
+        'coverStock': coverStock,
         'costPrice': costPrice,
         'sellingPrice': sellingPrice,
         'lowStockThreshold': lowStockThreshold,

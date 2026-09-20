@@ -101,10 +101,17 @@ const calcQuantityAndCost = (body) => {
     return { quantity: length, costPrice: Number(body.costPerMeter) || 0 };
   }
   if (pt === 'foam') {
+    const colorStockQtyF = (() => {
+      if (!Array.isArray(body.colorStocks) || body.colorStocks.length === 0) return null;
+      return body.colorStocks.reduce(
+        (sum, c) => sum + Math.max(Number(c.quantity) || 0, Number(c.pieces) || 0),
+        0
+      );
+    })();
     const sizes = Array.isArray(body.sizeStocks) ? body.sizeStocks : [];
     const qty = sizes.length > 0
       ? sizes.reduce((sum, s) => sum + (Number(s.pieces) || 0), 0)
-      : (colorStockQty !== null ? colorStockQty : Number(body.quantity) || 0);
+      : (colorStockQtyF !== null ? colorStockQtyF : Number(body.quantity) || 0);
     return { quantity: qty, costPrice: Number(body.costPrice) || 0 };
   }
   if (pt === 'pillow') {
@@ -122,7 +129,7 @@ const createProduct = asyncHandler(async (req, res) => {
     carpetWidth, carpetHeight, carpetPieces, carpetPiecesData, costPerSqft,
     costPerPiece, qaleenSizes,
     meterLength, costPerMeter,
-    foamLength, foamWidth, foamThickness, pillowSize, sizeStocks,
+    foamLength, foamWidth, foamThickness, pillowSize, sizeStocks, pillowStock, coverStock,
   } = req.body;
 
   if (!name) throw new ApiError(400, 'Product name is required.');
@@ -157,6 +164,8 @@ const createProduct = asyncHandler(async (req, res) => {
     foamThickness: foamThickness || 0,
     pillowSize: pillowSize || '',
     sizeStocks: sizeStocks || [],
+    pillowStock: pillowStock || 0,
+    coverStock: coverStock || 0,
     costPrice,
     sellingPrice: sellingPrice || 0,
     quantity,
@@ -198,6 +207,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     'costPerPiece', 'qaleenSizes',
     'meterLength', 'costPerMeter',
     'foamLength', 'foamWidth', 'foamThickness', 'pillowSize', 'sizeStocks',
+    'pillowStock', 'coverStock',
   ];
   allowed.forEach((field) => {
     if (req.body[field] !== undefined) product[field] = req.body[field];

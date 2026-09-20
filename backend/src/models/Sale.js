@@ -8,6 +8,9 @@ const saleItemSchema = new mongoose.Schema(
     unitPrice: { type: Number, required: true, min: 0 },
     totalAmount: { type: Number, required: true, min: 0 },
     costPrice: { type: Number, default: 0 },
+    foamQty: { type: Number, default: 0, min: 0 },
+    pillowQty: { type: Number, default: 0, min: 0 },
+    coverQty: { type: Number, default: 0, min: 0 },
   },
   { _id: false }
 );

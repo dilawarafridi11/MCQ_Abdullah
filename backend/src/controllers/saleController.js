@@ -78,13 +78,69 @@ const createSale = asyncHandler(async (req, res) => {
     if (product.shop.toString() !== shopId.toString()) {
       throw new ApiError(400, `"${product.name}" does not belong to this shop.`);
     }
+
+    const unitPrice = item.unitPrice !== undefined ? Number(item.unitPrice) : product.sellingPrice;
+    if (!unitPrice || unitPrice < 0) throw new ApiError(400, 'Unit price must be positive.');
+
+    if (product.productType === 'foam') {
+      const foamQty = Math.floor(Number(item.foamQty) || 0);
+      const pillowQty = Math.floor(Number(item.pillowQty) || 0);
+      const coverQty = Math.floor(Number(item.coverQty) || 0);
+      if (foamQty + pillowQty + coverQty <= 0) {
+        throw new ApiError(400, `Enter a quantity for "${product.name}".`);
+      }
+      if (product.quantity < foamQty) {
+        throw new ApiError(400, `Insufficient foam stock for "${product.name}" (only ${product.quantity} foam left).`);
+      }
+      if (product.pillowStock < pillowQty) {
+        throw new ApiError(400, `Insufficient pillow stock for "${product.name}" (only ${product.pillowStock} pillows left).`);
+      }
+      if (product.coverStock < coverQty) {
+        throw new ApiError(400, `Insufficient foam cover stock for "${product.name}" (only ${product.coverStock} covers left).`);
+      }
+
+      product.quantity -= foamQty;
+      product.pillowStock -= pillowQty;
+      product.coverStock -= coverQty;
+      if (foamQty > 0 && Array.isArray(product.colorStocks) && product.colorStocks.length > 0) {
+        let remaining = foamQty;
+        for (const cs of product.colorStocks) {
+          const avail = Math.max(Number(cs.quantity) || 0, Number(cs.pieces) || 0);
+          const deduct = Math.min(avail, remaining);
+          if (deduct > 0) {
+            if (Number(cs.quantity)) cs.quantity -= deduct;
+            else cs.pieces -= deduct;
+            remaining -= deduct;
+          }
+          if (remaining <= 0) break;
+        }
+      }
+      await product.save();
+
+      const totalQty = foamQty + pillowQty + coverQty;
+      const itemTotal = totalQty * unitPrice;
+      saleItems.push({
+        product: product._id,
+        productName: product.name,
+        quantity: totalQty,
+        unitPrice,
+        totalAmount: itemTotal,
+        costPrice: product.costPrice,
+        foamQty,
+        pillowQty,
+        coverQty,
+      });
+      subtotal += itemTotal;
+      profit += (unitPrice - product.costPrice) * totalQty;
+      continue;
+    }
+
     const qty = Number(item.quantity);
     if (!qty || qty <= 0) throw new ApiError(400, 'Quantity must be positive.');
     if (product.quantity < qty) {
       throw new ApiError(400, `Insufficient stock for "${product.name}" (only ${product.quantity} left).`);
     }
 
-    const unitPrice = item.unitPrice !== undefined ? Number(item.unitPrice) : product.sellingPrice;
     const itemTotal = qty * unitPrice;
     product.quantity -= qty;
     await product.save();
@@ -96,6 +152,9 @@ const createSale = asyncHandler(async (req, res) => {
       unitPrice,
       totalAmount: itemTotal,
       costPrice: product.costPrice,
+      foamQty: 0,
+      pillowQty: 0,
+      coverQty: 0,
     });
     subtotal += itemTotal;
     profit += (unitPrice - product.costPrice) * qty;
@@ -235,7 +294,16 @@ const deleteSale = asyncHandler(async (req, res) => {
 
   if (restock) {
     for (const item of sale.items) {
-      await Product.findByIdAndUpdate(item.product, { $inc: { quantity: item.quantity } });
+      const product = await Product.findById(item.product);
+      if (!product) continue;
+      if (item.foamQty || item.pillowQty || item.coverQty) {
+        product.quantity += item.foamQty || 0;
+        product.pillowStock += item.pillowQty || 0;
+        product.coverStock += item.coverQty || 0;
+      } else {
+        product.quantity += item.quantity;
+      }
+      await product.save();
     }
   }
 

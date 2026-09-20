@@ -4,6 +4,9 @@ class SaleItem {
   final int quantity;
   final double unitPrice;
   final double totalAmount;
+  final int foamQty;
+  final int pillowQty;
+  final int coverQty;
 
   const SaleItem({
     required this.productId,
@@ -11,7 +14,12 @@ class SaleItem {
     required this.quantity,
     required this.unitPrice,
     required this.totalAmount,
+    this.foamQty = 0,
+    this.pillowQty = 0,
+    this.coverQty = 0,
   });
+
+  bool get isFoam => foamQty > 0 || pillowQty > 0 || coverQty > 0;
 
   factory SaleItem.fromJson(Map<String, dynamic> json) {
     final product = json['product'];
@@ -23,6 +31,9 @@ class SaleItem {
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
       unitPrice: (json['unitPrice'] as num?)?.toDouble() ?? 0,
       totalAmount: (json['totalAmount'] as num?)?.toDouble() ?? 0,
+      foamQty: (json['foamQty'] as num?)?.toInt() ?? 0,
+      pillowQty: (json['pillowQty'] as num?)?.toInt() ?? 0,
+      coverQty: (json['coverQty'] as num?)?.toInt() ?? 0,
     );
   }
 }

@@ -21,6 +21,7 @@ const colorStockSchema = new mongoose.Schema(
     color: { type: String, required: true, trim: true },
     sets: { type: Number, default: 0, min: 0 },
     pieces: { type: Number, default: 0, min: 0 },
+    quantity: { type: Number, default: 0, min: 0 },
   },
   { _id: false }
 );
@@ -60,6 +61,8 @@ const productSchema = new mongoose.Schema(
     foamThickness: { type: Number, default: 0 },
     pillowSize: { type: String, default: '' },
     sizeStocks: { type: [sizeStockSchema], default: [] },
+    pillowStock: { type: Number, default: 0, min: 0 },
+    coverStock: { type: Number, default: 0, min: 0 },
 
     costPrice: { type: Number, required: true, min: 0, default: 0 },
     sellingPrice: { type: Number, min: 0, default: 0 },

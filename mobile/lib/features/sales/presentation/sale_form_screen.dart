@@ -30,11 +30,15 @@ class _CartItem {
   double height = 0;
   double length = 0;
   int qty = 1;
+  int pillowQty = 0;
+  int coverQty = 0;
   double sellingPrice = 0;
 
   String get _type => product.productType;
 
   double get area => width * height;
+
+  int get totalQty => _type == 'foam' ? qty + pillowQty + coverQty : qty;
 
   double get quantity {
     switch (_type) {
@@ -42,23 +46,14 @@ class _CartItem {
         return area;
       case 'meter':
         return length;
-      case 'qaleen':
+      case 'foam':
+        return totalQty.toDouble();
       default:
         return qty.toDouble();
     }
   }
 
-  double get unitPrice {
-    switch (_type) {
-      case 'carpet':
-        return sellingPrice;
-      case 'meter':
-        return sellingPrice;
-      case 'qaleen':
-      default:
-        return sellingPrice;
-    }
-  }
+  double get unitPrice => sellingPrice;
 
   double get lineTotal {
     switch (_type) {
@@ -66,7 +61,8 @@ class _CartItem {
         return area * sellingPrice;
       case 'meter':
         return length * sellingPrice;
-      case 'qaleen':
+      case 'foam':
+        return totalQty * sellingPrice;
       default:
         return qty * sellingPrice;
     }
@@ -79,7 +75,8 @@ class _CartItem {
         return width > 0 && height > 0;
       case 'meter':
         return length > 0;
-      case 'qaleen':
+      case 'foam':
+        return qty + pillowQty + coverQty > 0;
       default:
         return qty > 0;
     }
@@ -434,7 +431,9 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
     setState(() {
       final existing = _cart.where((c) => c.product.id == product.id).firstOrNull;
       if (existing == null) {
-        _cart.add(_CartItem(product));
+        final item = _CartItem(product);
+        item.sellingPrice = product.sellingPrice;
+        _cart.add(item);
       }
       _selectedProduct = null;
     });
@@ -461,11 +460,20 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
     }
     final sale = await ref.read(saleMutationControllerProvider.notifier).create(
           items: _cart
-              .map((c) => {
-                    'productId': c.product.id,
-                    'quantity': c.quantity,
-                    'unitPrice': c.unitPrice,
-                  })
+              .map((c) => c._type == 'foam'
+                  ? {
+                      'productId': c.product.id,
+                      'quantity': c.totalQty,
+                      'unitPrice': c.unitPrice,
+                      'foamQty': c.qty,
+                      'pillowQty': c.pillowQty,
+                      'coverQty': c.coverQty,
+                    }
+                  : {
+                      'productId': c.product.id,
+                      'quantity': c.quantity,
+                      'unitPrice': c.unitPrice,
+                    })
               .toList(),
           customerName: _customerNameController.text.trim().isEmpty
               ? 'Walk-in Customer'
@@ -562,6 +570,8 @@ class _CartEditor extends StatelessWidget {
                 onChanged: (v) => update(() => item.length = double.tryParse(v) ?? 0),
               ),
             )
+          else if (type == 'foam')
+            _FoamQtyFields(item: item, onChanged: onChanged)
           else
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -605,6 +615,64 @@ class _CartEditor extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _FoamQtyFields extends StatelessWidget {
+  const _FoamQtyFields({required this.item, required this.onChanged});
+
+  final _CartItem item;
+  final VoidCallback onChanged;
+
+  void update(VoidCallback fn) {
+    fn();
+    onChanged();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final product = item.product;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                initialValue: item.qty > 0 ? '${item.qty}' : '',
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Foam', isDense: true, prefixIcon: Icon(Icons.weekend_outlined, size: 18)),
+                onChanged: (v) => update(() => item.qty = int.tryParse(v) ?? 0),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextFormField(
+                initialValue: item.pillowQty > 0 ? '${item.pillowQty}' : '',
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Pillows', isDense: true, prefixIcon: Icon(Icons.king_bed_outlined, size: 18)),
+                onChanged: (v) => update(() => item.pillowQty = int.tryParse(v) ?? 0),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextFormField(
+                initialValue: item.coverQty > 0 ? '${item.coverQty}' : '',
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Foam Covers', isDense: true, prefixIcon: Icon(Icons.bedroom_parent_outlined, size: 18)),
+                onChanged: (v) => update(() => item.coverQty = int.tryParse(v) ?? 0),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'In stock — Foam: ${product.quantity} · Pillows: ${product.pillowStock} · Covers: ${product.coverStock}',
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.gold),
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 }
